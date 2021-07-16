@@ -1,5 +1,5 @@
 # antlifeii
-![Icon](icons/256.png)\
+![Icon](icons/256.png)
 
 Fanmade sequel to Ant Life
 
