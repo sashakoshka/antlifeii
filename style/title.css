@@ -1,0 +1,10 @@
+body{margin:32px;background-image:var(--tex-grass-scroll)}
+main{width:256px;margin:auto}
+
+@media(min-height:512px){
+  html,body{height:100%;width:100%;scroll:none}
+  body{
+    overflow:hidden;position:fixed;
+    margin:0;display:flex;flex-direction:column;
+    align-items:center;justify-content:center}
+}
