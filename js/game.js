@@ -5,20 +5,19 @@ function fade(duration) {
   setTimeout(() => {document.body.style.opacity = 1}, duration ?? 0)
 }
 
-function setStyle(name) {
+function setStyle(css) {
   let sheet = document.getElementById("statestyle")
   if(sheet) document.head.removeChild(sheet)
   
-  sheet = document.createElement("link")
-  sheet.setAttribute("rel", "stylesheet")
-  sheet.setAttribute("href", "style/" + name)
+  sheet = document.createElement("style")
   sheet.setAttribute("id", "statestyle")
+  sheet.textContent = css
   
   document.head.appendChild(sheet)
 }
 
 function initMenu(menu) {
-  setStyle("title.css")
+  setStyle(titlecss)
   switch(menu) {
     case "title":
       document.body.innerHTML = `
@@ -70,7 +69,7 @@ var resizeObserver = new ResizeObserver((entries) => {
 async function initGame(slot) { // 0 will be multiplayer
   document.body.style.opacity = 0
   await sleep(1000)
-  setStyle("game.css")
+  setStyle(gamecss)
   scrub(document.body)
   
   // build terrain
