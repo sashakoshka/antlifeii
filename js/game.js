@@ -1,3 +1,5 @@
+const urlParams = new URLSearchParams(window.location.search);
+
 function sleep(ms) {return new Promise(resolve => setTimeout(resolve, ms))}
 function scrub(el) {el.textContent=""}
 function fade(duration) {
@@ -79,7 +81,7 @@ var resizeObserver = new ResizeObserver((entries) => {
 
 async function initGame(slot) { // 0 will be multiplayer
   document.body.style.opacity = 0
-  await sleep(1000)
+  if(!urlParams.get("initGame")) await sleep(1000)
   setStyle(gamecss)
   scrub(document.body)
   
@@ -89,6 +91,7 @@ async function initGame(slot) { // 0 will be multiplayer
     terrain[i] = new Array(256)
     terrain[i].fill(1)
   }
+  terrain[32][32] = 5
   
   // create UI elements
   view = document.createElement("div"); {
@@ -145,5 +148,9 @@ function hill_paint() {
 
 }
 
-initMenu("title")
-fade(200)
+if(urlParams.get("initGame")) {
+  initGame(urlParams.get("initGame"))
+} else {
+  initMenu("title")
+  fade(200)
+}
