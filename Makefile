@@ -19,5 +19,12 @@ all: clean
 	echo \`                                     >> index.html
 	
 	cat js/tex.js js/game.js html/after-js.html >> index.html
+
+js:
+	
+
+css:
+	
+
 clean:
-	rm -f index.html
+	rm -f index.html build/*
