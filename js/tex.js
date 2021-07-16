@@ -1,5 +1,5 @@
 var texTiles = [null] // first el is null because air
-for(let i = 1; i < 2; i++) {
+for(let i = 1; i < src_texTiles.length; i++) {
   texTiles.push(new Image())
-  texTiles[i].src = "tex/tile/" + i + ".png"
+  texTiles[i].src = src_texTiles[i]
 }

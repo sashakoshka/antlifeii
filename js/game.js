@@ -28,6 +28,7 @@ function initMenu(menu) {
           <input type=password name=password>
           <input type=submit value=Login>
           <a onclick="initMenu('saves')">Play offline</a>
+          <a onclick="initMenu('about')">About</a>
         </form>
       </main>`
       break
@@ -42,6 +43,16 @@ function initMenu(menu) {
           <button onclick="initMenu('title')">&lt;&lt; Back</button>
         </div>
       </main>`
+      break
+    case "about":
+      document.body.innerHTML = `
+      <main>
+        <div class=scroll>
+          <p>Ant Life II is a fanmade sequel to Ant Life/Ants Life. It is licensed under the GPL, version 3.0. Rigt click this page and select &quot;View Page Source&quot; for more information.</p>
+          <button onclick="initMenu('title')">&lt;&lt; Back</button>
+        </div>
+      </main>
+      `
       break
   }
 }

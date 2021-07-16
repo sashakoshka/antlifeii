@@ -17,12 +17,17 @@ body{font-size:11pt;user-select:none;background-color:#506c50}
 
 .menu{
   padding:16px;max-width:256px;
-  border-image:var(--tex-border) 8 / 8px / 0 repeat;
-  border-width:8px;
-  background-image:var(--tex-wood0);
-  box-shadow:0 2px 4px rgba(0,0,0,0.5)}
+  border-image:var(--tex-border) 8 / 8px / 0 repeat;border-width:8px;
+  background-image:var(--tex-wood0);box-shadow:0 2px 4px rgba(0,0,0,0.5)}
 .menu>*:not(input){display:block;text-align:center}
+.menu>*{margin-top:0}
 .menu>*:not(:first-child){margin-top:16px}
+
+.scroll{
+  padding:16px;max-width:256px;
+  background-image:var(--tex-paper0);box-shadow:0 2px 4px rgba(0,0,0,0.5)}
+.scroll>*{margin:0}
+.scroll>*:not(:first-child){margin-top:16px}
 
 input,button{
   appearance:none;--webkit-appearance:none;

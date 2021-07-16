@@ -40,10 +40,13 @@ body{
     width:512px}
 }
 `
+const src_texTiles = [null,
+'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAPFBMVEVQaERYdEhIXERMYDhAVCxQbFBcgFBYdFQ0SCBogFRIUDxohGAoVDhkjFg8TEBwjFhskGQoLBxwmFxkdFD7x310AAAB5ElEQVQ4yzVTCZLkMAgDBD6S9Oz1/7+uhNOZqWofgASSbZrZhJlbuJtFmg23YYYYhkotdDG1YBS/yyyVxixLHQTTk3ce/LOAT4VHYDNvmCMHY67t8Mjo4iqWjOVqE1mYOebF1IZgPgPer2w1FuF1CC5KW7dyW1PwwY8E4BhKCwSMrH3qXKyTd+TH/+0OQGvRB9w/qsftVumGbRRxjrPHYStMlSMs81mQ2UZyovhhahGEDLbb9jtFMtTG7i5uNf2rDovb1Qq+M1VRTmxYZb3oQuCkpQznTybiIHm4XiFELyI/Ku2qw3GkZSV/xTQr8r69x6CIPH2F5qD9bzZ0Juyh45bwiHtmq7Y5RTJixkDkjxekd8SKRzBRrXoP3gqkgyg7k52s6iuCcgB1Opq0FPwhgzNT+uADeYIs2ZIwWRaXzADfh+5pL6L7kq/UJmZwsWkSy1u3pmI+xOQiE1Vvbyn/mX/9LdN7mdBeO8jalRKBSSw519FlnhlAOpAQT3qUk+selbcA3ar3zvvFRJtGco1zQRXCnktEdLJ2A8vAXVrTQpMdXq/b+RziXm3xwPcB0J98cqQoHBeg/Em19ODsDwa+qoUeKuZp1/B4KxQKdnxofhlBFrQfReDf8qhWIfqF6XCQzrS2zH/slQh3YgBXkwAAAABJRU5ErkJggg==',
+]
 var texTiles = [null] // first el is null because air
-for(let i = 1; i < 2; i++) {
+for(let i = 1; i < src_texTiles.length; i++) {
   texTiles.push(new Image())
-  texTiles[i].src = "tex/tile/" + i + ".png"
+  texTiles[i].src = src_texTiles[i]
 }
 function sleep(ms) {return new Promise(resolve => setTimeout(resolve, ms))}
 function scrub(el) {el.textContent=""}
@@ -75,6 +78,7 @@ function initMenu(menu) {
           <input type=password name=password>
           <input type=submit value=Login>
           <a onclick="initMenu('saves')">Play offline</a>
+          <a onclick="initMenu('about')">About</a>
         </form>
       </main>`
       break
@@ -89,6 +93,16 @@ function initMenu(menu) {
           <button onclick="initMenu('title')">&lt;&lt; Back</button>
         </div>
       </main>`
+      break
+    case "about":
+      document.body.innerHTML = `
+      <main>
+        <div class=scroll>
+          <p>Ant Life II is a fanmade sequel to Ant Life/Ants Life. It is licensed under the GPL, version 3.0. Rigt click this page and select &quot;View Page Source&quot; for more information.</p>
+          <button onclick="initMenu('title')">&lt;&lt; Back</button>
+        </div>
+      </main>
+      `
       break
   }
 }

@@ -9,6 +9,9 @@ case "$2" in
   css)
     echo "--tex-$varname:url('data:$mimetype;base64,$content');"
     ;;
+  jsli)
+    echo "'data:$mimetype;base64,$content',"
+    ;;
   *)
     echo "data:$mimetype;base64,$content"
     ;;
