@@ -13,7 +13,7 @@ body{opacity:0;transition:opacity 1s}
 
 @font-face{font-family:spec;  src:url("/font/s.ttf")}
 @font-face{font-family:spec-b;src:url("/font/sb.ttf")}
-*{font-family:spec}
+*:not(pre){font-family:spec}
 
 body{font-size:11pt;user-select:none;background-color:#506c50}
 
@@ -28,7 +28,7 @@ body{font-size:11pt;user-select:none;background-color:#506c50}
 .menu>a{color:#d8d0b0;text-shadow:0 2px 4px black;text-decoration:none;cursor:pointer}
 .menu>a:hover{text-decoration:underline}
 
-.menu{
+.menu,.scroll{
   padding:16px;max-width:256px;
   border-image:var(--tex-border) 8 / 8px / 0 repeat;border-width:8px;
   background-image:var(--tex-wood0);box-shadow:0 2px 4px rgba(0,0,0,0.5)}
@@ -36,11 +36,12 @@ body{font-size:11pt;user-select:none;background-color:#506c50}
 .menu>*{margin-top:0}
 .menu>*:not(:first-child){margin-top:16px}
 
-.scroll{
-  padding:16px;max-width:256px;
-  background-image:var(--tex-paper0);box-shadow:0 2px 4px rgba(0,0,0,0.5)}
+.scroll{background-image:var(--tex-paper0)}
 .scroll>*{margin:0}
 .scroll>*:not(:first-child){margin-top:16px}
+
+pre.license{
+  max-height:512px;overflow:auto}
 
 input,button{
   appearance:none;--webkit-appearance:none;

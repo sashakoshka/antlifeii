@@ -50,12 +50,33 @@ function initMenu(menu) {
       document.body.innerHTML = `
       <main>
         <div class=scroll>
-          <p>Ant Life II is a fanmade sequel to Ant Life/Ants Life. It is licensed under the GPL, version 3.0. Rigt click this page and select &quot;View Page Source&quot; for more information.</p>
+          <p>Ant Life II is a fanmade sequel to Ant Life/Ants Life. It is licensed under the GPL, version 3.0.</p>
+          <button onclick="initMenu('license')">View License</button>
           <button onclick="initMenu('title')">&lt;&lt; Back</button>
         </div>
       </main>
       `
       break
+    case "license": {
+      scrub(document.body)
+      let main = document.createElement("main")
+          main.style.width = "100%"
+          main.style.maxWidth = "768px"
+      let scroll = document.createElement("div")
+          scroll.className = "scroll"
+          scroll.style.maxWidth = "100%"
+      let licensePre = document.createElement("pre")
+          licensePre.className = "license"
+          licensePre.innerText = lisence
+      let back = document.createElement("button")
+          back.innerText = "<< Back"
+          back.onclick = () => {initMenu("about")}
+      scroll.appendChild(licensePre)
+      scroll.appendChild(back)
+      main.appendChild(scroll)
+      document.body.appendChild(main)
+      break  
+    }
   }
 }
 
@@ -91,7 +112,7 @@ async function initGame(slot) { // 0 will be multiplayer
     terrain[i] = new Array(256)
     terrain[i].fill(1)
   }
-  terrain[32][32] = 5
+  terrain[128][128] = 5
   
   // create UI elements
   view = document.createElement("div"); {

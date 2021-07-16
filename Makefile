@@ -19,7 +19,7 @@ js: clean-js
 	./base64.sh tex/tile/5.png       jsli       >> build/script.js
 	echo "]"                                    >> build/script.js
 	
-	cat js/tex.js js/game.js                    >> build/script.js
+	cat js/lisence.js js/tex.js js/game.js      >> build/script.js
 
 css: clean-css
 	echo ":root{"                               >  build/style.css
