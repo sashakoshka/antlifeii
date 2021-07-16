@@ -1,5 +1,5 @@
-@font-face{font-family:spec;  src:var(--font-spec-n)}
-@font-face{font-family:spec-b;src:var(--font-spec-b)}
+@font-face{font-family:spec;  src:url("/font/s")}
+@font-face{font-family:spec-b;src:url("/font/sb")}
 *{font-family:spec}
 
 body{font-size:11pt;user-select:none;background-color:#506c50}
