@@ -1,3 +1,8 @@
+// fuck you apple! suck my cock!
+document.addEventListener("gesturestart", (e) => {
+  e.preventDefault()
+})
+
 const urlParams = new URLSearchParams(window.location.search);
 
 function sleep(ms) {return new Promise(resolve => setTimeout(resolve, ms))}
@@ -61,7 +66,7 @@ function initMenu(menu) {
       scrub(document.body)
       let main = document.createElement("main")
           main.style.width = "100%"
-          main.style.maxWidth = "768px"
+          main.style.maxWidth = "608px"
       let scroll = document.createElement("div")
           scroll.className = "scroll"
           scroll.style.maxWidth = "100%"
@@ -146,6 +151,7 @@ async function initGame(slot) { // 0 will be multiplayer
   
   buttonPause = document.createElement("button"); {
     buttonPause.setAttribute("class", "pause")
+    buttonPause.onclick
     document.body.appendChild(buttonPause)
   }
   

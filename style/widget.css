@@ -27,8 +27,7 @@ body{font-size:11pt;user-select:none;background-color:#506c50}
 .scroll>*{margin:0}
 .scroll>*:not(:first-child){margin-top:16px}
 
-pre.license{
-  max-height:512px;overflow:auto}
+pre.license{max-height:512px;overflow:auto;font-size:9pt}
 
 input,button{
   appearance:none;--webkit-appearance:none;
@@ -61,4 +60,9 @@ button.pause{
   position:fixed;top:8px;left:calc(50% - 24px);
   padding:0;margin:0;width:48px;height:48px;
   border-image:none;border:none;
-  background-color:transparent;background-image:var(--tex-pause)}
+  background-color:transparent;background-image:var(--tex-pause);
+  box-shadow:none;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.7));
+  transition:filter 0.2s}
+
+button.pause:hover{filter:drop-shadow(0 2px 8px rgba(0,0,0,0.8))}
+button.pause:active{filter:drop-shadow(0 1px 2px rgba(0,0,0,0.5))}
