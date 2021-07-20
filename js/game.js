@@ -7,10 +7,8 @@ const urlParams = new URLSearchParams(window.location.search);
 
 function sleep(ms) {return new Promise(resolve => setTimeout(resolve, ms))}
 function scrub(el) {el.textContent=""}
-function fade(duration) {
-  document.body.style.opacity = 0
-  setTimeout(() => {document.body.style.opacity = 1}, duration ?? 0)
-}
+async function fadeOut() {document.body.style.opacity = 0; await sleep(1000)}
+async function fadeIn()  {document.body.style.opacity = 1}
 
 function setStyle(css) {
   let sheet = document.getElementById("statestyle")
@@ -93,7 +91,11 @@ var panel,              // bottom panel
     hill,               // anthil management canvas
       hillctx,
     buttonPause,        // pause button
-    terrain             // holds all tiles in the terrain
+    terrain,            // holds all tiles in the terrain
+    touchStart = {},    // holds the touch start coordinates
+    transStart = {},    // holds the position of the canvas contents at start
+    touchOff   = {},    // holds the current touch coordinates
+    trans = {x:0, y:0}  // holds the current canvas contents position
 
 var resizeObserver = new ResizeObserver((entries) => {
   let rect = entries[0].contentRect
@@ -106,8 +108,7 @@ var resizeObserver = new ResizeObserver((entries) => {
 })
 
 async function initGame(slot) { // 0 will be multiplayer
-  document.body.style.opacity = 0
-  if(!urlParams.get("initGame")) await sleep(1000)
+  if(!urlParams.get("initGame")) await fadeOut()
   setStyle(gamecss)
   scrub(document.body)
   
@@ -118,6 +119,10 @@ async function initGame(slot) { // 0 will be multiplayer
     terrain[i].fill(1)
   }
   terrain[128][128] = 5
+  
+  // reset variables
+  trans.x = terrain   .length / -64
+  trans.y = terrain[0].length / -64
   
   // create UI elements
   view = document.createElement("div"); {
@@ -138,7 +143,27 @@ async function initGame(slot) { // 0 will be multiplayer
   map = document.createElement("canvas"); {
     mapctx = map.getContext("2d")
     map.ant_paint = map_paint
-    map_paint()
+    
+    map.addEventListener("touchstart", (e) => {
+      e.preventDefault()
+      let touch = e.changedTouches[0]
+      
+      touchStart.x = touch.clientX
+      touchStart.y = touch.clientY
+      transStart.x = trans.x
+      transStart.y = trans.y
+      
+      map.ant_paint()
+    })
+    map.addEventListener("touchmove", (e) => {
+      e.preventDefault()
+      let touch = e.changedTouches[0]
+      trans.x = touch.clientX - touchStart.x + transStart.x
+      trans.y = touch.clientY - touchStart.y + transStart.y
+      map.ant_paint()
+    })
+    
+    map.ant_paint()
   }
   
   hill = document.createElement("canvas"); {
@@ -151,24 +176,46 @@ async function initGame(slot) { // 0 will be multiplayer
   
   buttonPause = document.createElement("button"); {
     buttonPause.setAttribute("class", "pause")
-    buttonPause.onclick
+    buttonPause.addEventListener("click", async () => {
+      await fadeOut()
+      initMenu("title")
+      await fadeIn()
+    })
     document.body.appendChild(buttonPause)
   }
   
   resizeObserver.observe(view)
-  fade()
+  await fadeIn()
 }
 
 function map_paint() {
+  mapctx.clearRect(0, 0, map.width, map.height);
+
+  mapctx.save()
+  mapctx.translate(trans.x, trans.y)
+  
+  let borderNW = {
+    x: (0 - trans.x) / 32 - 1,
+    y: (0 - trans.y) / 32 - 1
+  }
+  
+  let borderSE = {
+    x: (map.width  - trans.x) / 32,
+    y: (map.height - trans.y) / 32
+  }
+  
   for(var row = 0; row < terrain.length; row++)
   for(var col = 0; col < terrain[row].length; col++) {
     var tile = terrain[row][col]
     // TODO: check if out of bounds
-    if(tile > 0)
-      mapctx.drawImage(
-        texTiles[tile],
-        col * 32, row * 32, 32, 32)
+    if(
+      tile > 0 &&
+      col > borderNW.x && row > borderNW.y &&
+      col < borderSE.x && row < borderSE.y
+    )
+      mapctx.drawImage(texTiles[tile], col * 32, row * 32, 32, 32)
   }
+  mapctx.restore()
 }
 
 function hill_paint() {
@@ -179,5 +226,5 @@ if(urlParams.get("initGame")) {
   initGame(urlParams.get("initGame"))
 } else {
   initMenu("title")
-  fade(200)
+  fadeIn()
 }
