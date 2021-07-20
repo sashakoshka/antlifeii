@@ -17,8 +17,11 @@ body{
   padding:16px;
   border-image:var(--tex-border) 8 / 8px / 0 repeat;
   background-image:var(--tex-wood0);
-  box-shadow:0 2px 4px rgba(0,0,0,0.5);
+  box-shadow:0 2px 4px rgba(0,0,0,0.7);
   transition:bottom 0.2s}
+
+#minimap{
+  box-shadow:0 2px 4px rgba(0,0,0,0.5)}
 
 @media(min-width:544px){
   body{display:block}

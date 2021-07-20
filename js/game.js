@@ -84,8 +84,9 @@ function initMenu(menu) {
 }
 
 let panel,               // bottom panel
-      buttonSwitchView,  // switch from map to hill
     view,                // either contains map or hill
+    minimap,             // minimap canvas
+      minimapctx,
     map,                 // main gameplay canvas
       mapctx,
     hill,                // anthil management canvas
@@ -119,15 +120,16 @@ async function initGame(slot) { // 0 will be multiplayer
   terrain = new Array(256)
   for(let i = 0; i < terrain.length; i++) {
     terrain[i] = new Array(256)
-    terrain[i].fill(1)
   }
+  for(let y = 0; y < terrain.length;    y++)
+  for(let x = 0; x < terrain[y].length; x++)
+    terrain[y][x] = Math.floor(Math.random() * 2) + 1
+  
   terrain[128][128] = 5
   
   // reset variables
-  trans.x = (terrain   .length * -32 + window.innerWidth ) / 2
-  trans.y = (terrain[0].length * -32 + window.innerHeight) / 2
-  trans.x = Math.round(trans.x / 32) * 32
-  trans.y = Math.round(trans.y / 32) * 32
+  trans.x = Math.round((terrain   .length * -32 + window.innerWidth ) / 2)
+  trans.y = Math.round((terrain[0].length * -32 + window.innerHeight) / 2)
   transE.x = trans.x
   transE.y = trans.y
   
@@ -140,11 +142,16 @@ async function initGame(slot) { // 0 will be multiplayer
   panel = document.createElement("div"); {
     panel.setAttribute("id", "panel")
     document.body.appendChild(panel)
-    
-    buttonSwitchView = document.createElement("button"); {
-      buttonSwitchView.innerText = "Manage Hill"
-      panel.appendChild(buttonSwitchView)
-    }
+  }
+  
+  minimap = document.createElement("canvas"); {
+    minimapctx = minimap.getContext("2d")
+    minimap.ant_paint = minimap_paint
+    minimap.setAttribute("width",  96)
+    minimap.setAttribute("height", 96)
+    minimap.setAttribute("id", "minimap")
+    minimap_paint()
+    panel.appendChild(minimap)
   }
     
   map = document.createElement("canvas"); {
@@ -177,8 +184,8 @@ async function initGame(slot) { // 0 will be multiplayer
         trans.x -= e.deltaX * 2
         trans.y -= e.deltaY * 2
       }
-      trans.x = Math.round(trans.x / 32) * 32
-      trans.y = Math.round(trans.y / 32) * 32
+      trans.x = Math.round(trans.x)
+      trans.y = Math.round(trans.y)
       map.ant_paint()
     })
     
@@ -209,6 +216,7 @@ async function initGame(slot) { // 0 will be multiplayer
       transE.x += Math.round((trans.x - transE.x) / 2)
       transE.y += Math.round((trans.y - transE.y) / 2)
       map.ant_paint()
+      minimap.ant_paint()
       if(Math.abs(transE.x - trans.x) < 2) transE.x = trans.x
       if(Math.abs(transE.y - trans.y) < 2) transE.y = trans.y
     }
@@ -216,6 +224,39 @@ async function initGame(slot) { // 0 will be multiplayer
   
   resizeObserver.observe(view)
   await fadeIn()
+}
+
+function minimap_paint() {
+  
+  let viewW = Math.round(view.clientWidth  / 32),
+      viewH = Math.round(view.clientHeight / 32)
+  
+  let colC = Math.round(transE.x / -32 - (96 - viewW) / 2)
+  let row  = Math.round(transE.y / -32 - (96 - viewH) / 2)
+  let col
+  
+  for(let y = 0; y < 96; y++) {
+    col = colC
+    for(let x = 0; x < 96; x++) {
+      if(
+        row < 0 || row >= terrain.length ||
+        col < 0 || col >= terrain[0].length
+      )    minimapctx.fillStyle = "black"
+      else minimapctx.fillStyle = texColors[terrain[row][col]]
+      
+      minimapctx.fillRect(x, y, 2, 2)
+      col++
+    }
+    row++
+  }
+  
+  minimapctx.fillStyle = "none"
+  minimapctx.strokeStyle = "white"
+  
+  minimapctx.strokeRect(
+    Math.round((96 - viewW) / 2) + 0.5, Math.round((96 - viewH) / 2) + 0.5,
+    viewW, viewH
+  )
 }
 
 function map_paint() {
