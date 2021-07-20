@@ -83,21 +83,24 @@ function initMenu(menu) {
   }
 }
 
-var panel,              // bottom panel
-      buttonSwitchView, // switch from map to hill
-    view,               // either contains map or hill
-    map,                // main gameplay canvas
+let panel,               // bottom panel
+      buttonSwitchView,  // switch from map to hill
+    view,                // either contains map or hill
+    map,                 // main gameplay canvas
       mapctx,
-    hill,               // anthil management canvas
+    hill,                // anthil management canvas
       hillctx,
-    buttonPause,        // pause button
-    terrain,            // holds all tiles in the terrain
-    touchStart = {},    // holds the touch start coordinates
-    transStart = {},    // holds the position of the canvas contents at start
-    touchOff   = {},    // holds the current touch coordinates
-    trans = {x:0, y:0}  // holds the current canvas contents position
+    buttonPause,         // pause button
+    terrain,             // holds all tiles in the terrain
+    
+    touchStart = {},     // holds the touch start coordinates
+    transStart = {},     // holds the position of the canvas contents at start
+    touchOff   = {},     // holds the current touch coordinates
+    trans  = {x:0, y:0}, // holds the current canvas contents position
+    transE = {x:0, y:0}, // holds canvas position after easing function
+    easeInterval         // easing interval
 
-var resizeObserver = new ResizeObserver((entries) => {
+const resizeObserver = new ResizeObserver((entries) => {
   let rect = entries[0].contentRect
   let el   = view.firstChild
   
@@ -121,8 +124,12 @@ async function initGame(slot) { // 0 will be multiplayer
   terrain[128][128] = 5
   
   // reset variables
-  trans.x = terrain   .length / -64
-  trans.y = terrain[0].length / -64
+  trans.x = (terrain   .length * -32 + window.innerWidth ) / 2
+  trans.y = (terrain[0].length * -32 + window.innerHeight) / 2
+  trans.x = Math.round(trans.x / 32) * 32
+  trans.y = Math.round(trans.y / 32) * 32
+  transE.x = trans.x
+  transE.y = trans.y
   
   // create UI elements
   view = document.createElement("div"); {
@@ -162,6 +169,18 @@ async function initGame(slot) { // 0 will be multiplayer
       trans.y = touch.clientY - touchStart.y + transStart.y
       map.ant_paint()
     })
+    map.addEventListener("wheel", (e) => {
+      if(e.shiftKey) {
+        trans.x -= e.deltaY * 2
+        trans.y -= e.deltaX * 2
+      } else {
+        trans.x -= e.deltaX * 2
+        trans.y -= e.deltaY * 2
+      }
+      trans.x = Math.round(trans.x / 32) * 32
+      trans.y = Math.round(trans.y / 32) * 32
+      map.ant_paint()
+    })
     
     map.ant_paint()
   }
@@ -179,10 +198,21 @@ async function initGame(slot) { // 0 will be multiplayer
     buttonPause.addEventListener("click", async () => {
       await fadeOut()
       initMenu("title")
+      clearInterval(easeInterval)
       await fadeIn()
     })
     document.body.appendChild(buttonPause)
   }
+  
+  easeInterval = setInterval(() => {
+    if(trans.x !== transE.x || trans.y !== transE.y) {
+      transE.x += Math.round((trans.x - transE.x) / 2)
+      transE.y += Math.round((trans.y - transE.y) / 2)
+      map.ant_paint()
+      if(Math.abs(transE.x - trans.x) < 2) transE.x = trans.x
+      if(Math.abs(transE.y - trans.y) < 2) transE.y = trans.y
+    }
+  }, 32) // around 30 fps
   
   resizeObserver.observe(view)
   await fadeIn()
@@ -192,28 +222,27 @@ function map_paint() {
   mapctx.clearRect(0, 0, map.width, map.height);
 
   mapctx.save()
-  mapctx.translate(trans.x, trans.y)
+  mapctx.translate(transE.x, transE.y)
   
   let borderNW = {
-    x: (0 - trans.x) / 32 - 1,
-    y: (0 - trans.y) / 32 - 1
+    x: (0 - transE.x) / 32 - 1,
+    y: (0 - transE.y) / 32 - 1
   }
   
   let borderSE = {
-    x: (map.width  - trans.x) / 32,
-    y: (map.height - trans.y) / 32
+    x: (map.width  - transE.x) / 32,
+    y: (map.height - transE.y) / 32
   }
   
-  for(var row = 0; row < terrain.length; row++)
-  for(var col = 0; col < terrain[row].length; col++) {
-    var tile = terrain[row][col]
-    // TODO: check if out of bounds
+  for(let row = 0; row < terrain.length; row++)
+  for(let col = 0; col < terrain[row].length; col++) {
+    let tile = terrain[row][col]
+    // check if out of bounds
     if(
       tile > 0 &&
       col > borderNW.x && row > borderNW.y &&
       col < borderSE.x && row < borderSE.y
-    )
-      mapctx.drawImage(texTiles[tile], col * 32, row * 32, 32, 32)
+    ) mapctx.drawImage(texTiles[tile], col * 32, row * 32, 32, 32)
   }
   mapctx.restore()
 }
