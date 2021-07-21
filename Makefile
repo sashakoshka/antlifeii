@@ -3,8 +3,13 @@ all: clean js css
 	echo "<style>"                              >> index.html
 	cat build/style-min.css                     >> index.html
 	echo "</style>"                             >> index.html
-	cat html/middle.html build/script-min.js \
-	    html/end.html                           >> index.html
+	
+	cat html/middle.html                        >> index.html
+	
+	echo "<script>"                             >> index.html
+	cat build/perlin-min.js                     >> index.html
+	echo "</script><script>'use strict'"        >> index.html
+	cat build/script-min.js html/end.html       >> index.html
 
 js: clean-js
 	echo "const titlecss = \`"                  >  build/script.js
@@ -26,6 +31,7 @@ js: clean-js
 	cat js/lisence.js js/tex.js js/game.js      >> build/script.js
 	
 	uglifyjs build/script.js > build/script-min.js
+	uglifyjs js/perlin.js    > build/perlin-min.js
 
 css: clean-css
 	echo ":root{"                               >  build/style.css
@@ -46,7 +52,7 @@ clean: clean-js clean-css
 	rm -f index.html
 
 clean-js:
-	rm -f build/script.js build/script-min.js
+	rm -f build/script.js build/script-min.js build/perlin-min.js
 
 clean-css:
 	rm -f build/style.css build/style-min.css

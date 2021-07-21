@@ -2,7 +2,8 @@ html,body{width:100%;height:100%;scroll:none}
 body{
   overflow:hidden;position:fixed;
   margin:0;
-  background-image:var(--tex-sky0)}
+  background-color:black
+  /*background-image:var(--tex-sky0)*/}
 
 #view{
   position:fixed;top:0;left:0;

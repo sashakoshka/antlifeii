@@ -53,7 +53,7 @@ function initMenu(menu) {
       document.body.innerHTML = `
       <main>
         <div class=scroll>
-          <p>Ant Life II is a fanmade sequel to Ant Life/Ants Life. It is licensed under the GPL, version 3.0.</p>
+          <p>Ant Life II is a fanmade sequel to Ant Life/Ants Life. It is licensed under the GPL, version 3.0.</p><p>Uses <a href='https://github.com/joeiddon/perlin'>this library</a> by joeiddon for terrain generation.</p>
           <button onclick="initMenu('license')">View License</button>
           <button onclick="initMenu('title')">&lt;&lt; Back</button>
         </div>
@@ -109,6 +109,7 @@ const resizeObserver = new ResizeObserver((entries) => {
   el.height = view.clientHeight
   
   el.ant_paint()
+  minimap.ant_paint()
 })
 
 async function initGame(slot) { // 0 will be multiplayer
@@ -122,8 +123,41 @@ async function initGame(slot) { // 0 will be multiplayer
     terrain[i] = new Array(256)
   }
   for(let y = 0; y < terrain.length;    y++)
-  for(let x = 0; x < terrain[y].length; x++)
-    terrain[y][x] = Math.floor(Math.random() * 2) + 1
+  for(let x = 0; x < terrain[y].length; x++) {
+    if(Math.sqrt(Math.pow(x - 128, 2) + Math.pow(y - 128, 2)) < 5) {
+      terrain[y][x] = 4
+    } else {
+      let num = perlin.get(x / 64, y / 64)
+      if(num < -0.0001) {
+        terrain[y][x] = 1
+      } else if(num < 0) {
+        terrain[y][x] = 2
+      } else {
+        terrain[y][x] = 3
+      }
+    }
+  }
+  
+  perlin.seed()
+  for(let y = 0; y < terrain.length;    y++)
+  for(let x = 0; x < terrain[y].length; x++) {
+    let num = perlin.get(x / 64, y / 64)
+    if(num < 1 && terrain[y][x] === 3) {
+      terrain[y][x] = 4
+    }
+  }
+  
+  for(let y = 0; y < terrain.length;    y++)
+  for(let x = 0; x < terrain[y].length; x++) {
+    let num = perlin.get(x / 64, y / 64)
+    if(num < -0.2) {
+      terrain[y][x] = 1
+    } else if(num < 0) {
+      terrain[y][x] = 2
+    } else {
+      terrain[y][x] = 3
+    }
+  }
   
   terrain[128][128] = 5
   

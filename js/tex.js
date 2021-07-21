@@ -6,9 +6,9 @@ for(let i = 1; i < src_texTiles.length; i++) {
 
 const texColors = [
   "black",
-  "#506c50",
   "#6e86bb",
-  "brown",
-  "yellow",
+  "#e2bc91",
+  "#506c50",
+  "#5a4639",
   "white"
 ]
