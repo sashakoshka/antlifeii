@@ -118,6 +118,8 @@ async function initGame(slot) { // 0 will be multiplayer
   scrub(document.body)
   
   // build terrain
+  
+  perlin.seed()
   terrain = new Array(256)
   for(let i = 0; i < terrain.length; i++) {
     terrain[i] = new Array(256)
@@ -212,6 +214,32 @@ async function initGame(slot) { // 0 will be multiplayer
       trans.y = touch.clientY - touchStart.y + transStart.y
       map.ant_paint()
     })
+    
+    map.ant_dragging = false
+    map.addEventListener("contextmenu", (e) => {
+      e.preventDefault()
+      
+      touchStart.x = e.clientX
+      touchStart.y = e.clientY
+      transStart.x = trans.x
+      transStart.y = trans.y
+      
+      map.ant_paint()
+      map.ant_dragging = true
+    })
+    map.addEventListener("mousemove", (e) => {
+      e.preventDefault()
+      if(map.ant_dragging) {
+        trans.x = e.clientX - touchStart.x + transStart.x
+        trans.y = e.clientY - touchStart.y + transStart.y
+        map.ant_paint()
+      }
+    })
+    map.addEventListener("mouseup", (e) => {
+      e.preventDefault()
+      map.ant_dragging = false
+    })
+    
     map.addEventListener("wheel", (e) => {
       if(e.shiftKey) {
         trans.x -= e.deltaY * 2
