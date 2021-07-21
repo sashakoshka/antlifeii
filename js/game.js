@@ -124,13 +124,13 @@ async function initGame(slot) { // 0 will be multiplayer
   }
   for(let y = 0; y < terrain.length;    y++)
   for(let x = 0; x < terrain[y].length; x++) {
-    if(Math.sqrt(Math.pow(x - 128, 2) + Math.pow(y - 128, 2)) < 5) {
+    if(Math.sqrt(Math.pow(x - 128, 2) + Math.pow(y - 128, 2)) < 4) {
       terrain[y][x] = 4
     } else {
       let num = perlin.get(x / 64, y / 64)
-      if(num < -0.0001) {
+      if(num < -0.1) {
         terrain[y][x] = 1
-      } else if(num < 0) {
+      } else if(num < Math.random() / 20) {
         terrain[y][x] = 2
       } else {
         terrain[y][x] = 3
@@ -142,11 +142,12 @@ async function initGame(slot) { // 0 will be multiplayer
   for(let y = 0; y < terrain.length;    y++)
   for(let x = 0; x < terrain[y].length; x++) {
     let num = perlin.get(x / 64, y / 64)
-    if(num < 1 && terrain[y][x] === 3) {
+    if(num < -0.2 + Math.random() / 10 && terrain[y][x] === 3) {
       terrain[y][x] = 4
     }
   }
   
+  /*
   for(let y = 0; y < terrain.length;    y++)
   for(let x = 0; x < terrain[y].length; x++) {
     let num = perlin.get(x / 64, y / 64)
@@ -158,6 +159,7 @@ async function initGame(slot) { // 0 will be multiplayer
       terrain[y][x] = 3
     }
   }
+  */
   
   terrain[128][128] = 5
   
