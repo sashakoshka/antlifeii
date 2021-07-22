@@ -4,6 +4,10 @@ let panel,               // bottom panel
       minimapctx,
     map,                 // main gameplay canvas
       mapctx,
+      grid,
+        gridctx,
+      entity,
+        entityctx,
     hill,                // anthil management canvas
       hillctx,
     buttonPause,         // pause button
@@ -15,16 +19,25 @@ let panel,               // bottom panel
     trans  = {x:0, y:0}, // holds the current canvas contents position
     transE = {x:0, y:0}, // holds canvas position after easing function
     easeInterval,        // easing interval
-    dragging             // if mouse is dragging
+    dragging = false     // if mouse is dragging
 
 const resizeObserver = new ResizeObserver((entries) => {
-  let rect = entries[0].contentRect
-  let el   = view.firstChild
+  const rect = entries[0].contentRect
   
-  el.width  = view.clientWidth
-  el.height = view.clientHeight
+  grid.width  = view.clientWidth
+  grid.height = view.clientHeight
+  grid.ant_paint()
   
-  el.ant_paint()
+  /*
+  entity.width  = view.clientWidth
+  entity.height = view.clientHeight
+  entity.ant_paint()
+  */
+  
+  map.width  = view.clientWidth
+  map.height = view.clientHeight
+  map.ant_paint()
+  
   minimap.ant_paint()
 })
 
@@ -79,6 +92,10 @@ async function initGame(slot) { // 0 will be multiplayer
     e.preventDefault()
     dragging = false
   })
+  document.addEventListener("touchend", (e) => {
+    //e.preventDefault()
+    dragging = false
+  })
   
   view = document.createElement("div"); {
     view.setAttribute("id", "view")
@@ -99,7 +116,7 @@ async function initGame(slot) { // 0 will be multiplayer
     
     // click on the minimap to move
     minimap.addEventListener("mousedown", (e) => {
-      var rect = e.target.getBoundingClientRect()
+      let rect = e.target.getBoundingClientRect()
       
       trans.x -= (e.clientX - rect.left - 48.5) * 32
       trans.y -= (e.clientY - rect.top  - 48) * 32
@@ -116,22 +133,23 @@ async function initGame(slot) { // 0 will be multiplayer
     // touch dragging to pan
     map.addEventListener("touchstart", (e) => {
       e.preventDefault()
-      let touch = e.changedTouches[0]
+      const touch = e.changedTouches[0]
       
       touchStart.x = touch.clientX
       touchStart.y = touch.clientY
       transStart.x = trans.x
       transStart.y = trans.y
+      
+      dragging = true
     })
     map.addEventListener("touchmove", (e) => {
       e.preventDefault()
-      let touch = e.changedTouches[0]
+      const touch = e.changedTouches[0]
       trans.x = touch.clientX - touchStart.x + transStart.x
       trans.y = touch.clientY - touchStart.y + transStart.y
     })
     
     // right click and drag to pan
-    dragging = false
     map.addEventListener("contextmenu", (e) => {
       e.preventDefault()
       
@@ -162,6 +180,13 @@ async function initGame(slot) { // 0 will be multiplayer
       trans.y = Math.round(trans.y)
     })
     
+    grid = document.createElement("canvas"); {
+      gridctx = grid.getContext("2d")
+      grid.ant_paint = grid_paint
+      
+      // initial paint
+    }
+    
     // initial paint
     map.ant_paint()
   }
@@ -189,6 +214,7 @@ async function initGame(slot) { // 0 will be multiplayer
     if(trans.x !== transE.x || trans.y !== transE.y) {
       transE.x += Math.round((trans.x - transE.x) / 2)
       transE.y += Math.round((trans.y - transE.y) / 2)
+      grid.ant_paint()
       map.ant_paint()
       minimap.ant_paint()
       if(Math.abs(transE.x - trans.x) < 2) transE.x = trans.x
@@ -201,7 +227,6 @@ async function initGame(slot) { // 0 will be multiplayer
 }
 
 function minimap_paint() {
-  
   let viewW = Math.round(view.clientWidth  / 32),
       viewH = Math.round(view.clientHeight / 32)
   
@@ -234,10 +259,14 @@ function minimap_paint() {
 }
 
 function map_paint() {
-  mapctx.clearRect(0, 0, map.width, map.height);
+  mapctx.drawImage(grid, 0, 0)
+}
 
-  mapctx.save()
-  mapctx.translate(transE.x, transE.y)
+function grid_paint() {
+  gridctx.clearRect(0, 0, grid.width, grid.height);
+
+  gridctx.save()
+  gridctx.translate(transE.x, transE.y)
   
   let borderNW = {
     x: (0 - transE.x) / 32 - 1,
@@ -245,8 +274,8 @@ function map_paint() {
   }
   
   let borderSE = {
-    x: (map.width  - transE.x) / 32,
-    y: (map.height - transE.y) / 32
+    x: (grid.width  - transE.x) / 32,
+    y: (grid.height - transE.y) / 32
   }
   
   for(let row = 0; row < terrain.length; row++)
@@ -257,9 +286,9 @@ function map_paint() {
       tile > 0 &&
       col > borderNW.x && row > borderNW.y &&
       col < borderSE.x && row < borderSE.y
-    ) mapctx.drawImage(texTiles[tile], col * 32, row * 32, 32, 32)
+    ) gridctx.drawImage(texTiles[tile], col * 32, row * 32, 32, 32)
   }
-  mapctx.restore()
+  gridctx.restore()
 }
 
 function hill_paint() {

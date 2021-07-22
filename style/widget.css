@@ -1,12 +1,12 @@
 @font-face{font-family:spec;  src:url("/font/s.ttf")}
 @font-face{font-family:spec-b;src:url("/font/sb.ttf")}
-*{image-rendering:crisp-edges}
-*:not(pre){
-  font-family:spec;
-  user-select:none !important;-webkit-touch-callout:none !important;
-  -webkit-user-select:none !important}
+*{image-rendering:crisp-edges;touch-action:manipulation}
+*:not(pre){font-family:spec}
 
-body{font-size:11pt;background-color:#506c50}
+body{
+  font-size:11pt;background-color:#506c50;
+  user-select:none !important;
+  -webkit-touch-callout:none !important;-webkit-user-select:none !important}
 
 .title{
   font-size:48px;font-family:spec-b;
