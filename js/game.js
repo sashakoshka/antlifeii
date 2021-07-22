@@ -262,42 +262,38 @@ function minimap_paint() {
 }
 
 function map_paint() {
+  mapctx.clearRect(0, 0, map.width, map.height)
   mapctx.drawImage(terrain_buf, 0, 0)
   mapctx.drawImage(entity_buf, 0, 0)
 }
 
 function terrain_buf_paint() {
-  terrain_bufctx.clearRect (
-    0, 0,
-    terrain_buf_paint.width, terrain_buf_paint.height
-  )
+  terrain_bufctx.clearRect(0, 0, terrain_buf.width, terrain_buf.height)
 
   terrain_bufctx.save()
   terrain_bufctx.translate(transE.x, transE.y)
   
+  // get borders for screen and round to nearest tile
   let borderNW = {
-    x: (0 - transE.x) / 32 - 1,
-    y: (0 - transE.y) / 32 - 1
-  }
-  
+    x: Math.floor((0 - transE.x) / 32),
+    y: Math.floor((0 - transE.y) / 32)}
   let borderSE = {
-    x: (terrain_buf.width  - transE.x) / 32,
-    y: (terrain_buf.height - transE.y) / 32
-  }
+    x: Math.ceil((terrain_buf.width  - transE.x) / 32),
+    y: Math.ceil((terrain_buf.height - transE.y) / 32)}
   
-  let tilesDrawn = 0
+  // dont render tiles out of bounds
+  if(borderNW.x < 0) borderNW.x = 0
+  if(borderNW.y < 0) borderNW.y = 0
+  if(borderSE.x >= terrain   .length) borderSE.x = terrain   .length
+  if(borderSE.y >= terrain[0].length) borderSE.y = terrain[0].length
   
-  for(let row = 0; row < terrain.length; row++)
-  for(let col = 0; col < terrain[row].length; col++) {
+  // render all visible tiles
+  for(let row = borderNW.y; row < borderSE.y; row++)
+  for(let col = borderNW.x; col < borderSE.x; col++) {
     let tile = terrain[row][col]
-    // check if out of bounds
-    if(
-      tile > 0 &&
-      col > borderNW.x && row > borderNW.y &&
-      col < borderSE.x && row < borderSE.y
-    ) {
+    // check if air
+    if(tile > 0) {
       terrain_bufctx.drawImage(texTiles[tile], col * 32, row * 32, 32, 32)
-      tilesDrawn++
     }
   }
   terrain_bufctx.restore()
