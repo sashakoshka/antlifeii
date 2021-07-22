@@ -28,8 +28,14 @@ js: clean-js
 	./base64.sh tex/tile/5.png       jsli       >> build/script.js
 	echo "]"                                    >> build/script.js
 	
+	echo "const src_texAnts = ["                >> build/script.js
+	./base64.sh tex/entity/ant_worker.png  jsli >> build/script.js
+	./base64.sh tex/entity/ant_soldier.png jsli >> build/script.js
+	./base64.sh tex/entity/ant_builder.png jsli >> build/script.js
+	echo "]"                                    >> build/script.js
+	
 	cat js/util.js js/lisence.js js/tex.js \
-	    js/menu.js js/game.js                   >> build/script.js
+	    js/menu.js js/ant.js js/game.js         >> build/script.js
 	
 	#cat build/script.js      > build/script-min.js
 	uglifyjs build/script.js > build/script-min.js

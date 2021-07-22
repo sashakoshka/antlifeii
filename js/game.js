@@ -12,6 +12,7 @@ let panel,               // bottom panel
       hillctx,
     buttonPause,         // pause button
     terrain,             // holds all tiles in the terrain
+    ants,                // holds all ants
     
     touchStart = {},     // holds the touch start coordinates
     transStart = {},     // holds the position of the canvas contents at start
@@ -77,6 +78,13 @@ async function initGame(slot) { // 0 will be multiplayer
   }
   
   terrain[128][128] = 5
+  
+  // wipe entities
+  ants = []
+  for(let i = 0; i < 1024; i++)
+    ants.push(new Ant(
+      Math.round(Math.random() * 256), Math.round(Math.random() * 256), 0
+    ))
   
   // reset variables
   trans.x = Math.round((terrain   .length * -32 + window.innerWidth ) / 2)
@@ -252,7 +260,7 @@ function minimap_paint() {
     row++
   }
   
-  minimapctx.fillStyle = "none"
+  minimapctx.fillStyle = "transparent"
   minimapctx.strokeStyle = "white"
   
   minimapctx.strokeRect(
@@ -300,7 +308,31 @@ function terrain_buf_paint() {
 }
 
 function entity_buf_paint() {
+  entity_bufctx.clearRect(0, 0, entity_buf.width, entity_buf.height)
+  entity_bufctx.save()
+  entity_bufctx.translate(transE.x, transE.y)
   
+  // get borders for screen and round to nearest tile
+  let borderNW = {
+    x: Math.floor((0 - transE.x) / 32) - 1,
+    y: Math.floor((0 - transE.y) / 32) - 1}
+  let borderSE = {
+    x: Math.ceil((terrain_buf.width  - transE.x) / 32),
+    y: Math.ceil((terrain_buf.height - transE.y) / 32)}
+  
+  for(let ant of ants) {
+    if(
+      ant.x > borderNW.x && ant.y > borderNW.y &&
+      ant.x < borderSE.x && ant.y < borderSE.y
+    )
+      entity_bufctx.drawImage(
+        texAnts[ant.type],
+        0, 0, 32, 32,
+        ant.x * 32, ant.y * 32, 32, 32
+      )
+  }
+  
+  entity_bufctx.restore()
 }
 
 function hill_paint() {

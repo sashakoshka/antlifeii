@@ -4,6 +4,12 @@ for(let i = 1; i < src_texTiles.length; i++) {
   texTiles[i].src = src_texTiles[i]
 }
 
+const texAnts = []
+for(let i = 0; i < src_texAnts.length; i++) {
+  texAnts.push(new Image())
+  texAnts[i].src = src_texAnts[i]
+}
+
 const texColors = [
   "black",
   "#6e86bb",
