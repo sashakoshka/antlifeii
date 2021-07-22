@@ -31,8 +31,9 @@ js: clean-js
 	cat js/util.js js/lisence.js js/tex.js \
 	    js/menu.js js/game.js                   >> build/script.js
 	
+	#cat build/script.js      > build/script-min.js
 	uglifyjs build/script.js > build/script-min.js
-	uglifyjs js/perlin.js    > build/perlin-min.js
+	uglifyjs js/perlin.js    > build/perlin-min.js	
 
 css: clean-css
 	echo ":root{"                               >  build/style.css

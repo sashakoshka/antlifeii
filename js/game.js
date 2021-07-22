@@ -4,10 +4,10 @@ let panel,               // bottom panel
       minimapctx,
     map,                 // main gameplay canvas
       mapctx,
-      grid,
-        gridctx,
-      entity,
-        entityctx,
+      terrain_buf,
+        terrain_bufctx,
+      entity_buf,
+        entity_bufctx,
     hill,                // anthil management canvas
       hillctx,
     buttonPause,         // pause button
@@ -24,15 +24,13 @@ let panel,               // bottom panel
 const resizeObserver = new ResizeObserver((entries) => {
   const rect = entries[0].contentRect
   
-  grid.width  = view.clientWidth
-  grid.height = view.clientHeight
-  grid.ant_paint()
+  terrain_buf.width  = view.clientWidth
+  terrain_buf.height = view.clientHeight
+  terrain_buf.ant_paint()
   
-  /*
-  entity.width  = view.clientWidth
-  entity.height = view.clientHeight
-  entity.ant_paint()
-  */
+  entity_buf.width  = view.clientWidth
+  entity_buf.height = view.clientHeight
+  entity_buf.ant_paint()
   
   map.width  = view.clientWidth
   map.height = view.clientHeight
@@ -180,41 +178,46 @@ async function initGame(slot) { // 0 will be multiplayer
       trans.y = Math.round(trans.y)
     })
     
-    grid = document.createElement("canvas"); {
-      gridctx = grid.getContext("2d")
-      grid.ant_paint = grid_paint
-      
-      // initial paint
+    // create terrain buffer
+    terrain_buf = document.createElement("canvas"); {
+      terrain_bufctx = terrain_buf.getContext("2d")
+      terrain_buf.ant_paint = terrain_buf_paint
     }
     
-    // initial paint
-    map.ant_paint()
+    // create entity buffer
+    entity_buf = document.createElement("canvas"); {
+      entity_bufctx = entity_buf.getContext("2d")
+      entity_buf.ant_paint = entity_buf_paint
+    }
   }
   
   hill = document.createElement("canvas"); {
     hillctx = hill.getContext("2d")
     hill.ant_paint = hill_paint
-    hill_paint()
   }
   
   view.appendChild(map)
   
+  // create pause button
   buttonPause = document.createElement("button"); {
     buttonPause.setAttribute("class", "pause")
     buttonPause.addEventListener("click", async () => {
       await fadeOut()
-      initMenu("title")
       clearInterval(easeInterval)
+      resizeObserver.disconnect()
+      initMenu("title")
       await fadeIn()
     })
     document.body.appendChild(buttonPause)
   }
   
+  // easing interval, for smooth panning
   easeInterval = setInterval(() => {
     if(trans.x !== transE.x || trans.y !== transE.y) {
       transE.x += Math.round((trans.x - transE.x) / 2)
       transE.y += Math.round((trans.y - transE.y) / 2)
-      grid.ant_paint()
+      terrain_buf.ant_paint()
+      entity_buf.ant_paint()
       map.ant_paint()
       minimap.ant_paint()
       if(Math.abs(transE.x - trans.x) < 2) transE.x = trans.x
@@ -259,14 +262,18 @@ function minimap_paint() {
 }
 
 function map_paint() {
-  mapctx.drawImage(grid, 0, 0)
+  mapctx.drawImage(terrain_buf, 0, 0)
+  mapctx.drawImage(entity_buf, 0, 0)
 }
 
-function grid_paint() {
-  gridctx.clearRect(0, 0, grid.width, grid.height);
+function terrain_buf_paint() {
+  terrain_bufctx.clearRect (
+    0, 0,
+    terrain_buf_paint.width, terrain_buf_paint.height
+  )
 
-  gridctx.save()
-  gridctx.translate(transE.x, transE.y)
+  terrain_bufctx.save()
+  terrain_bufctx.translate(transE.x, transE.y)
   
   let borderNW = {
     x: (0 - transE.x) / 32 - 1,
@@ -274,9 +281,11 @@ function grid_paint() {
   }
   
   let borderSE = {
-    x: (grid.width  - transE.x) / 32,
-    y: (grid.height - transE.y) / 32
+    x: (terrain_buf.width  - transE.x) / 32,
+    y: (terrain_buf.height - transE.y) / 32
   }
+  
+  let tilesDrawn = 0
   
   for(let row = 0; row < terrain.length; row++)
   for(let col = 0; col < terrain[row].length; col++) {
@@ -286,9 +295,16 @@ function grid_paint() {
       tile > 0 &&
       col > borderNW.x && row > borderNW.y &&
       col < borderSE.x && row < borderSE.y
-    ) gridctx.drawImage(texTiles[tile], col * 32, row * 32, 32, 32)
+    ) {
+      terrain_bufctx.drawImage(texTiles[tile], col * 32, row * 32, 32, 32)
+      tilesDrawn++
+    }
   }
-  gridctx.restore()
+  terrain_bufctx.restore()
+}
+
+function entity_buf_paint() {
+  
 }
 
 function hill_paint() {

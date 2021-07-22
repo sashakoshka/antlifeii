@@ -1,5 +1,5 @@
-@font-face{font-family:spec;  src:url("/font/s.ttf")}
-@font-face{font-family:spec-b;src:url("/font/sb.ttf")}
+@font-face{font-family:spec;  src:url("font/s.ttf")}
+@font-face{font-family:spec-b;src:url("font/sb.ttf")}
 *{image-rendering:crisp-edges;touch-action:manipulation}
 *:not(pre){font-family:spec}
 
