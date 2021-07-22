@@ -97,9 +97,12 @@ async function initGame(slot) { // 0 will be multiplayer
     minimap.setAttribute("height", 96)
     minimap.setAttribute("id", "minimap")
     
+    // click on the minimap to move
     minimap.addEventListener("mousedown", (e) => {
-      trans.x += 32 * 32
-      trans.y += 32 * 32
+      var rect = e.target.getBoundingClientRect()
+      
+      trans.x -= (e.clientX - rect.left - 48.5) * 32
+      trans.y -= (e.clientY - rect.top  - 48) * 32
     })
     
     minimap_paint()
@@ -110,6 +113,7 @@ async function initGame(slot) { // 0 will be multiplayer
     mapctx = map.getContext("2d")
     map.ant_paint = map_paint
     
+    // touch dragging to pan
     map.addEventListener("touchstart", (e) => {
       e.preventDefault()
       let touch = e.changedTouches[0]
@@ -126,6 +130,7 @@ async function initGame(slot) { // 0 will be multiplayer
       trans.y = touch.clientY - touchStart.y + transStart.y
     })
     
+    // right click and drag to pan
     dragging = false
     map.addEventListener("contextmenu", (e) => {
       e.preventDefault()
@@ -139,7 +144,6 @@ async function initGame(slot) { // 0 will be multiplayer
     })
     map.addEventListener("mousemove", (e) => {
       e.preventDefault()
-      console.log(e)
       if(dragging) {
         trans.x = e.clientX - touchStart.x + transStart.x
         trans.y = e.clientY - touchStart.y + transStart.y
@@ -158,6 +162,7 @@ async function initGame(slot) { // 0 will be multiplayer
       trans.y = Math.round(trans.y)
     })
     
+    // initial paint
     map.ant_paint()
   }
   
