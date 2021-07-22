@@ -19,8 +19,12 @@ let panel,               // bottom panel
     touchOff   = {},     // holds the current touch coordinates
     trans  = {x:0, y:0}, // holds the current canvas contents position
     transE = {x:0, y:0}, // holds canvas position after easing function
+    dragging = false,    // if mouse is dragging
+
     easeInterval,        // easing interval
-    dragging = false     // if mouse is dragging
+    tickInterval,        // animation interval
+    
+    animFrame            // goes from 0-15 every tick
 
 const resizeObserver = new ResizeObserver((entries) => {
   const rect = entries[0].contentRect
@@ -81,7 +85,7 @@ async function initGame(slot) { // 0 will be multiplayer
   
   // wipe entities
   ants = []
-  for(let i = 0; i < 1024; i++)
+  for(let i = 0; i < 512; i++)
     ants.push(new Ant(
       Math.round(Math.random() * 256), Math.round(Math.random() * 256), 0
     ))
@@ -91,6 +95,7 @@ async function initGame(slot) { // 0 will be multiplayer
   trans.y = Math.round((terrain[0].length * -32 + window.innerHeight) / 2)
   transE.x = trans.x
   transE.y = trans.y
+  animFrame = 0
   
   // create UI elements
   
@@ -212,6 +217,7 @@ async function initGame(slot) { // 0 will be multiplayer
     buttonPause.addEventListener("click", async () => {
       await fadeOut()
       clearInterval(easeInterval)
+      clearInterval(tickInterval)
       resizeObserver.disconnect()
       initMenu("title")
       await fadeIn()
@@ -232,6 +238,8 @@ async function initGame(slot) { // 0 will be multiplayer
       if(Math.abs(transE.y - trans.y) < 2) transE.y = trans.y
     }
   }, 32) // around 30 fps
+  
+  tickInterval = setInterval(tick, 50)
   
   resizeObserver.observe(view)
   await fadeIn()
@@ -321,15 +329,18 @@ function entity_buf_paint() {
     y: Math.ceil((terrain_buf.height - transE.y) / 32)}
   
   for(let ant of ants) {
-    if(
+    if (
       ant.x > borderNW.x && ant.y > borderNW.y &&
       ant.x < borderSE.x && ant.y < borderSE.y
-    )
-      entity_bufctx.drawImage(
+    ) {
+      entity_bufctx.drawImage (
         texAnts[ant.type],
-        0, 0, 32, 32,
-        ant.x * 32, ant.y * 32, 32, 32
+        0 + (animFrame < 8) * 32 + (ant.cargoCount > 0) * 64, ant.dir * 32,
+        32, 32,
+        ant.x * 32, ant.y * 32,
+        32, 32
       )
+    }
   }
   
   entity_bufctx.restore()
@@ -337,6 +348,19 @@ function entity_buf_paint() {
 
 function hill_paint() {
 
+}
+
+function tick() {
+  animFrame ++
+  animFrame %= 16
+
+  // tick ants
+  for(let ant of ants) {
+    ant.tick()
+  }
+  
+  entity_buf.ant_paint()
+  map.ant_paint()
 }
 
 if(urlParams.get("initGame")) {
