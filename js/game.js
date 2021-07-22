@@ -1,88 +1,3 @@
-// fuck you apple! suck my cock!
-document.addEventListener("gesturestart", (e) => {
-  e.preventDefault()
-})
-
-const urlParams = new URLSearchParams(window.location.search);
-
-function sleep(ms) {return new Promise(resolve => setTimeout(resolve, ms))}
-function scrub(el) {el.textContent=""}
-async function fadeOut() {document.body.style.opacity = 0; await sleep(1000)}
-async function fadeIn()  {document.body.style.opacity = 1}
-
-function setStyle(css) {
-  let sheet = document.getElementById("statestyle")
-  if(sheet) document.head.removeChild(sheet)
-  
-  sheet = document.createElement("style")
-  sheet.setAttribute("id", "statestyle")
-  sheet.textContent = css
-  
-  document.head.appendChild(sheet)
-}
-
-function initMenu(menu) {
-  setStyle(titlecss)
-  switch(menu) {
-    case "title":
-      document.body.innerHTML = `
-      <main>
-        <center class=title>Ant Life II</center>
-        <form class=menu>
-          <input type=text name=name>
-          <input type=password name=password>
-          <input type=submit value=Login>
-          <a onclick="initMenu('saves')">Play offline</a>
-          <a onclick="initMenu('about')">About</a>
-        </form>
-      </main>`
-      break
-    case "saves":
-      document.body.innerHTML = `
-      <main>
-        <div class=menu>
-          <button onclick="initGame(1)">Slot 1</button>
-          <button onclick="initGame(2)">Slot 2</button>
-          <button onclick="initGame(3)">Slot 3</button>
-          <button onclick="initGame(4)">Slot 4</button>
-          <button onclick="initMenu('title')">&lt;&lt; Back</button>
-        </div>
-      </main>`
-      break
-    case "about":
-      document.body.innerHTML = `
-      <main>
-        <div class=scroll>
-          <p>Ant Life II is a fanmade sequel to Ant Life/Ants Life. It is licensed under the GPL, version 3.0.</p><p>Uses <a href='https://github.com/joeiddon/perlin'>this library</a> by joeiddon for terrain generation.</p>
-          <button onclick="initMenu('license')">View License</button>
-          <button onclick="initMenu('title')">&lt;&lt; Back</button>
-        </div>
-      </main>
-      `
-      break
-    case "license": {
-      scrub(document.body)
-      let main = document.createElement("main")
-          main.style.width = "100%"
-          main.style.maxWidth = "608px"
-      let scroll = document.createElement("div")
-          scroll.className = "scroll"
-          scroll.style.maxWidth = "100%"
-      let licensePre = document.createElement("pre")
-          licensePre.className = "license"
-          licensePre.innerText = lisence
-      let back = document.createElement("button")
-          back.innerText = "<< Back"
-          back.onclick = () => {initMenu("about")}
-      scroll.appendChild(licensePre)
-      scroll.appendChild(back)
-      main.appendChild(scroll)
-      document.body.appendChild(main)
-      break  
-    }
-  }
-}
-
 let panel,               // bottom panel
     view,                // either contains map or hill
     minimap,             // minimap canvas
@@ -99,7 +14,8 @@ let panel,               // bottom panel
     touchOff   = {},     // holds the current touch coordinates
     trans  = {x:0, y:0}, // holds the current canvas contents position
     transE = {x:0, y:0}, // holds canvas position after easing function
-    easeInterval         // easing interval
+    easeInterval,        // easing interval
+    dragging             // if mouse is dragging
 
 const resizeObserver = new ResizeObserver((entries) => {
   let rect = entries[0].contentRect
@@ -149,20 +65,6 @@ async function initGame(slot) { // 0 will be multiplayer
     }
   }
   
-  /*
-  for(let y = 0; y < terrain.length;    y++)
-  for(let x = 0; x < terrain[y].length; x++) {
-    let num = perlin.get(x / 64, y / 64)
-    if(num < -0.2) {
-      terrain[y][x] = 1
-    } else if(num < 0) {
-      terrain[y][x] = 2
-    } else {
-      terrain[y][x] = 3
-    }
-  }
-  */
-  
   terrain[128][128] = 5
   
   // reset variables
@@ -172,6 +74,12 @@ async function initGame(slot) { // 0 will be multiplayer
   transE.y = trans.y
   
   // create UI elements
+  
+  document.addEventListener("mouseup", (e) => {
+    e.preventDefault()
+    dragging = false
+  })
+  
   view = document.createElement("div"); {
     view.setAttribute("id", "view")
     document.body.appendChild(view)
@@ -188,6 +96,12 @@ async function initGame(slot) { // 0 will be multiplayer
     minimap.setAttribute("width",  96)
     minimap.setAttribute("height", 96)
     minimap.setAttribute("id", "minimap")
+    
+    minimap.addEventListener("mousedown", (e) => {
+      trans.x += 32 * 32
+      trans.y += 32 * 32
+    })
+    
     minimap_paint()
     panel.appendChild(minimap)
   }
@@ -204,18 +118,15 @@ async function initGame(slot) { // 0 will be multiplayer
       touchStart.y = touch.clientY
       transStart.x = trans.x
       transStart.y = trans.y
-      
-      map.ant_paint()
     })
     map.addEventListener("touchmove", (e) => {
       e.preventDefault()
       let touch = e.changedTouches[0]
       trans.x = touch.clientX - touchStart.x + transStart.x
       trans.y = touch.clientY - touchStart.y + transStart.y
-      map.ant_paint()
     })
     
-    map.ant_dragging = false
+    dragging = false
     map.addEventListener("contextmenu", (e) => {
       e.preventDefault()
       
@@ -224,20 +135,15 @@ async function initGame(slot) { // 0 will be multiplayer
       transStart.x = trans.x
       transStart.y = trans.y
       
-      map.ant_paint()
-      map.ant_dragging = true
+      dragging = true
     })
     map.addEventListener("mousemove", (e) => {
       e.preventDefault()
-      if(map.ant_dragging) {
+      console.log(e)
+      if(dragging) {
         trans.x = e.clientX - touchStart.x + transStart.x
         trans.y = e.clientY - touchStart.y + transStart.y
-        map.ant_paint()
       }
-    })
-    map.addEventListener("mouseup", (e) => {
-      e.preventDefault()
-      map.ant_dragging = false
     })
     
     map.addEventListener("wheel", (e) => {
@@ -250,7 +156,6 @@ async function initGame(slot) { // 0 will be multiplayer
       }
       trans.x = Math.round(trans.x)
       trans.y = Math.round(trans.y)
-      map.ant_paint()
     })
     
     map.ant_paint()

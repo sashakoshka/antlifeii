@@ -28,7 +28,8 @@ js: clean-js
 	./base64.sh tex/tile/5.png       jsli       >> build/script.js
 	echo "]"                                    >> build/script.js
 	
-	cat js/lisence.js js/tex.js js/game.js      >> build/script.js
+	cat js/util.js js/lisence.js js/tex.js \
+	    js/menu.js js/game.js                   >> build/script.js
 	
 	uglifyjs build/script.js > build/script-min.js
 	uglifyjs js/perlin.js    > build/perlin-min.js
