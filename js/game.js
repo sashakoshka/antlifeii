@@ -135,14 +135,17 @@ async function initGame(slot) { // 0 will be multiplayer
       minimap.addEventListener("mousedown", (e) => {
         let rect = e.target.getBoundingClientRect()
         
-        trans.x -= (e.clientX - rect.left - 64.5) * 32
-        trans.y -= (e.clientY - rect.top  - 64) * 32
+        trans.x -= Math.round(e.clientX - rect.left - 64.5) * 32
+        trans.y -= Math.round(e.clientY - rect.top  - 64) * 32
       })
       
       minimap_paint()
       panel.appendChild(minimap)
     }
+    
+    // right of the minimap, has bars and info
     let panelControlDiv = document.createElement("div"); {
+      // shows amount of food
       foodSpan = document.createElement("span"); {
         foodSpan.innerText = "Food"
         panelControlDiv.appendChild(foodSpan)
@@ -152,6 +155,8 @@ async function initGame(slot) { // 0 will be multiplayer
         foodBar.setAttribute("value", food)
         panelControlDiv.appendChild(foodBar)
       }
+      
+      // shows amount of ants
       antSpan = document.createElement("span"); {
         antSpan.innerText = "Ants"
         panelControlDiv.appendChild(antSpan)

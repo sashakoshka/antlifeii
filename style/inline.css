@@ -1,3 +1,5 @@
-html{background-color:black}
+html{
+  background-color:black;background-image:var(--tex-loading);
+  background-repeat:no-repeat;background-position:center;}
 body{opacity:0;transition:opacity 1s}
 
