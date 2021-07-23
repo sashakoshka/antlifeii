@@ -22,6 +22,7 @@ class Ant {
         break
     }
     
+    this.breath = 7
     this.health = this.maxHealth
     this.cargo = null
     this.cargoCount = 0
@@ -75,7 +76,9 @@ class Ant {
         this.face(2)
       }
       
-      if(Math.random() < 0.1) this.hurt(1)
+      if(Math.random() < 0.1)
+        if(this.breath > 0) this.breath --
+        else this.hurt(1)
     } else {
       this.lastLand.x = this.x
       this.lastLand.y = this.y
@@ -94,6 +97,8 @@ class Ant {
         this.dir = 1
         this.step(0.125)
       }
+      
+      if(this.breath < 7) this.breath ++
     }
   }
 }

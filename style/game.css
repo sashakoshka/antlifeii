@@ -13,6 +13,7 @@ body{
   width:100%;height:100%}
 
 #panel{
+  display:grid;grid-template-columns:128px auto;
   position:fixed;left:0;bottom:0;
   width:calc(100% - 32px);height:128px;
   padding:16px;
@@ -21,8 +22,18 @@ body{
   box-shadow:0 2px 4px rgba(0,0,0,0.7);
   transition:bottom 0.2s}
 
-#minimap{
-  box-shadow:0 2px 4px rgba(0,0,0,0.5)}
+#panel>div{
+  display:grid;height:40px;
+  grid-template-columns:48px auto;grid-template-rows:20px 20px;
+  padding:0 6px 0 16px}
+#panel>div>span{
+  display:flex;align-items:center;
+  color:white;text-shadow:0 2px 4px black}
+#panel>div>progress{
+  display:flex;align-items:center;margin:6px 0
+}
+
+#minimap{box-shadow:0 2px 4px rgba(0,0,0,0.7)}
 
 @media(min-width:544px){
   body{display:block}

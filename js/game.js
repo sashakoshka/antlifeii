@@ -1,7 +1,11 @@
 let panel,               // bottom panel
+      minimap,           // minimap canvas
+        minimapctx,
+      foodSpan,
+      foodBar,
+      antSpan,
+      antBar,
     view,                // either contains map or hill
-    minimap,             // minimap canvas
-      minimapctx,
     map,                 // main gameplay canvas
       mapctx,
       terrain_buf,
@@ -13,6 +17,8 @@ let panel,               // bottom panel
     buttonPause,         // pause button
     terrain,             // holds all tiles in the terrain
     ants,                // holds all ants
+    food,
+    foodMax,
     
     touchStart = {},     // holds the touch start coordinates
     transStart = {},     // holds the position of the canvas contents at start
@@ -20,6 +26,7 @@ let panel,               // bottom panel
     trans  = {x:0, y:0}, // holds the current canvas contents position
     transE = {x:0, y:0}, // holds canvas position after easing function
     dragging = false,    // if mouse is dragging
+    viewMoving = false,  // if view is moving
 
     easeInterval,        // easing interval
     tickInterval,        // animation interval
@@ -96,6 +103,8 @@ async function initGame(slot) { // 0 will be multiplayer
   transE.x = trans.x
   transE.y = trans.y
   animFrame = 0
+  food = 16
+  foodMax = 128
   
   // create UI elements
   
@@ -115,26 +124,46 @@ async function initGame(slot) { // 0 will be multiplayer
   
   panel = document.createElement("div"); {
     panel.setAttribute("id", "panel")
-    document.body.appendChild(panel)
-  }
-  
-  minimap = document.createElement("canvas"); {
-    minimapctx = minimap.getContext("2d")
-    minimap.ant_paint = minimap_paint
-    minimap.setAttribute("width",  128)
-    minimap.setAttribute("height", 128)
-    minimap.setAttribute("id", "minimap")
-    
-    // click on the minimap to move
-    minimap.addEventListener("mousedown", (e) => {
-      let rect = e.target.getBoundingClientRect()
+    minimap = document.createElement("canvas"); {
+      minimapctx = minimap.getContext("2d")
+      minimap.ant_paint = minimap_paint
+      minimap.setAttribute("width",  128)
+      minimap.setAttribute("height", 128)
+      minimap.setAttribute("id", "minimap")
       
-      trans.x -= (e.clientX - rect.left - 64.5) * 32
-      trans.y -= (e.clientY - rect.top  - 64) * 32
-    })
-    
-    minimap_paint()
-    panel.appendChild(minimap)
+      // click on the minimap to move
+      minimap.addEventListener("mousedown", (e) => {
+        let rect = e.target.getBoundingClientRect()
+        
+        trans.x -= (e.clientX - rect.left - 64.5) * 32
+        trans.y -= (e.clientY - rect.top  - 64) * 32
+      })
+      
+      minimap_paint()
+      panel.appendChild(minimap)
+    }
+    let panelControlDiv = document.createElement("div"); {
+      foodSpan = document.createElement("span"); {
+        foodSpan.innerText = "Food"
+        panelControlDiv.appendChild(foodSpan)
+      }
+      foodBar = document.createElement("progress"); {
+        foodBar.setAttribute("max", foodMax)
+        foodBar.setAttribute("value", food)
+        panelControlDiv.appendChild(foodBar)
+      }
+      antSpan = document.createElement("span"); {
+        antSpan.innerText = "Ants"
+        panelControlDiv.appendChild(antSpan)
+      }
+      antBar = document.createElement("progress"); {
+        antBar.setAttribute("max", 512)
+        antBar.setAttribute("value", 256)
+        panelControlDiv.appendChild(antBar)
+      }
+      panel.appendChild(panelControlDiv)
+    }
+    document.body.appendChild(panel)
   }
     
   map = document.createElement("canvas"); {
@@ -236,6 +265,7 @@ async function initGame(slot) { // 0 will be multiplayer
   // easing interval, for smooth panning
   easeInterval = setInterval(() => {
     if(trans.x !== transE.x || trans.y !== transE.y) {
+      viewMoving = true
       transE.x += Math.round((trans.x - transE.x) / 2)
       transE.y += Math.round((trans.y - transE.y) / 2)
       terrain_buf.ant_paint()
@@ -244,7 +274,7 @@ async function initGame(slot) { // 0 will be multiplayer
       minimap.ant_paint()
       if(Math.abs(transE.x - trans.x) < 2) transE.x = trans.x
       if(Math.abs(transE.y - trans.y) < 2) transE.y = trans.y
-    }
+    } else viewMoving = false
   }, 32) // around 30 fps
   
   tickInterval = setInterval(tick, 50)
@@ -367,8 +397,10 @@ function tick() {
     ant.tick()
   }
   
-  entity_buf.ant_paint()
-  map.ant_paint()
+  if(!viewMoving) {
+    entity_buf.ant_paint()
+    map.ant_paint()
+  }
 }
 
 if(urlParams.get("initGame")) {
