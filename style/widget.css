@@ -13,7 +13,6 @@ body{
   background: linear-gradient(#f3e2c7 0%,#c19e67 50%,#b68d4c 51%, #e9d4b3 100%);
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  /* -webkit-text-stroke: 2px #381818; */
   filter:drop-shadow(0 2px 4px black)}
 
 .menu>a{color:#d8d0b0;text-shadow:0 2px 4px black;text-decoration:none;cursor:pointer}

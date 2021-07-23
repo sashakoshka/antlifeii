@@ -34,6 +34,10 @@ js: clean-js
 	./base64.sh tex/entity/ant_builder.png jsli >> build/script.js
 	echo "]"                                    >> build/script.js
 	
+	echo "const src_texUI = ["                  >> build/script.js
+	./base64.sh tex/selection.png          jsli >> build/script.js
+	echo "]"                                    >> build/script.js
+	
 	cat js/util.js js/lisence.js js/tex.js \
 	    js/menu.js js/ant.js js/game.js         >> build/script.js
 	

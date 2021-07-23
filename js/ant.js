@@ -2,6 +2,7 @@ class Ant {
   constructor(x, y, type) {
     this.x = x
     this.y = y
+    this.lastLand = {x: 0, y: 0}
     this.type = type
     
     switch(type) {
@@ -22,7 +23,12 @@ class Ant {
     this.dir = 2
   }
   
+  get tileOn() {
+    return terrain[Math.round(this.y)]?.[Math.round(this.x)] ?? 0
+  }
+  
   step(distance) {
+    if(this.tileOn < 3) distance /= 2 // move slower on sand
     switch(this.dir) {
       case 0: this.y -= distance; break
       case 1: this.x += distance; break
@@ -38,20 +44,38 @@ class Ant {
   
   tick() {
     this.step(0.125)
-    if(Math.random() < 0.1) this.face(Math.random() * 4)
-    if(this.y > terrain.length - 1) {
-      this.dir = 0
-      this.step(0.125)
-    } else if(this.x > terrain[0].length - 1) {
-      this.dir = 3
-      this.step(0.125)
-    } else if(this.y < 0) {
-      this.dir = 2
-      this.step(0.125)
-    } else if(this.x < 0) {
-      this.dir = 1
-      this.step(0.125)
+    let tile = this.tileOn
+    if(tile === 1) {
+      let xr = Math.round(this.x)
+      let yr = Math.round(this.y)
+      
+      if(this.lastLand.x < this.x) {
+        this.face(3)
+      } else if(this.lastLand.x > this.x) {
+        this.face(1)
+      } else if(this.lastLand.y < this.y){
+        this.face(0)
+      } else {
+        this.face(2)
+      }
+    } else {
+      this.lastLand.x = this.x
+      this.lastLand.y = this.y
+      if(Math.random() < (tile === 2 ? 0.01 : 0.02)) // turn slower on sand
+        this.face(Math.random() * 4)
+      if(this.y > terrain.length - 1) {
+        this.dir = 0
+        this.step(0.125)
+      } else if(this.x > terrain[0].length - 1) {
+        this.dir = 3
+        this.step(0.125)
+      } else if(this.y < 0) {
+        this.dir = 2
+        this.step(0.125)
+      } else if(this.x < 0) {
+        this.dir = 1
+        this.step(0.125)
+      }
     }
-    // TODO: check other bounds
   }
 }
