@@ -5,7 +5,18 @@ class Ant {
     this.x = x
     this.y = y
     this.lastLand = {x: 0, y: 0}
+    
+    /*
+      0: worker
+      1: soldier
+      2: builder
+    */
     this.type = type ?? 0
+    
+    /*
+      0: wander
+    */
+    this.state = 0
     
     // have a unique ant id
     this.id = antsCount ++
@@ -38,6 +49,7 @@ class Ant {
     ants = ants.filter((ant) => {
       return ant.id !== this.id
     })
+    if(selectionType === 2 && selectionObj.id === this.id) selectionType = 0
     updateBars()
   }
   
@@ -100,6 +112,12 @@ class Ant {
       }
       
       if(this.breath < 7) this.breath ++
+    }
+    if(Math.random() < 0.0001) {
+      if(food > 0) {
+        food--
+        updateBars()
+      } else this.die()
     }
   }
 }

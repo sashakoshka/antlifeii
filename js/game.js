@@ -28,6 +28,10 @@ let panel,               // bottom panel
     transE = {x:0, y:0}, // holds canvas position after easing function
     dragging = false,    // if mouse is dragging
     viewMoving = false,  // if view is moving
+    touchMoved,          // if the touch moved
+    
+    selectionType,       // what is currently being selected
+    selectionObj,        // the object that is being selected
 
     easeInterval,        // easing interval
     tickInterval,        // animation interval
@@ -103,7 +107,12 @@ async function initGame(slot) { // 0 will be multiplayer
   trans.y = Math.round((terrain[0].length * -32 + window.innerHeight) / 2)
   transE.x = trans.x
   transE.y = trans.y
+  
+  selectionType = 0
+  selectionObj = 0
+  
   animFrame = 0
+  
   antsMax = 512
   food = 16
   foodMax = 128
@@ -180,15 +189,24 @@ async function initGame(slot) { // 0 will be multiplayer
       transStart.y = trans.y
       
       dragging = true
+      touchMoved = false
     })
     map.addEventListener("touchmove", (e) => {
       e.preventDefault()
       const touch = e.changedTouches[0]
       trans.x = touch.clientX - touchStart.x + transStart.x
       trans.y = touch.clientY - touchStart.y + transStart.y
+      touchMoved = true
+    })
+    map.addEventListener("touchend", (e) => {
+      const touch = e.changedTouches[0]
+      if(!touchMoved) {
+        processTap(touch.clientX, touch.clientY)
+      }
     })
     
     // right click and drag to pan
+    map.addEventListener("mousedown", (e) => {touchMoved = false})
     map.addEventListener("contextmenu", (e) => {
       e.preventDefault()
       
@@ -198,14 +216,22 @@ async function initGame(slot) { // 0 will be multiplayer
       transStart.y = trans.y
       
       dragging = true
+      touchMoved = false
     })
     map.addEventListener("mousemove", (e) => {
       e.preventDefault()
       if(dragging) {
         trans.x = e.clientX - touchStart.x + transStart.x
         trans.y = e.clientY - touchStart.y + transStart.y
+        touchMoved = true
       }
     })
+    map.addEventListener("mouseup", (e) => {
+      if(!touchMoved) {
+        processTap(e.clientX, e.clientY)
+      }
+    })
+    
     // should not stop when moving over panel
     panel.addEventListener("mousemove", (e) => {
       if(dragging) {
@@ -349,11 +375,13 @@ function terrain_buf_paint() {
       terrain_bufctx.drawImage(texTiles[tile], col * 32, row * 32, 32, 32)
     }
   }
+  
   terrain_bufctx.restore()
 }
 
 function entity_buf_paint() {
   entity_bufctx.clearRect(0, 0, entity_buf.width, entity_buf.height)
+  
   entity_bufctx.save()
   entity_bufctx.translate(transE.x, transE.y)
   
@@ -372,12 +400,31 @@ function entity_buf_paint() {
     ) {
       entity_bufctx.drawImage (
         texAnts[ant.type],
-        0 + (animFrame < 8) * 32 + (ant.cargoCount > 0) * 64, ant.dir * 32,
+        (animFrame < 8) * 32 + (ant.cargoCount > 0) * 64, ant.dir * 32,
         32, 32,
         ant.x * 32, ant.y * 32,
         32, 32
       )
     }
+  }
+  
+  if(selectionType > 0) {
+    let selX = 0, selY = 0 // center of what is being selected
+    switch(selectionType) {
+      case 1: // anthill
+        selX = 128 + 0.5
+        selY = 128 + 0.5
+        break
+      case 2: // ant
+        selX = selectionObj.x + 0.5
+        selY = selectionObj.y + 0.5
+        break
+    }
+    entity_bufctx.drawImage(
+      texUI[0],
+      (animFrame < 8) * 48, 0, 48, 48,
+      selX * 32 - 24, selY * 32 - 24, 48, 48
+    )
   }
   
   entity_bufctx.restore()
@@ -409,6 +456,25 @@ function updateBars() {
   antSpan.innerText = "Ants (" + ants.length + "/" + antsMax + ")"
   antBar.setAttribute("max", antsMax)
   antBar.setAttribute("value", ants.length)
+}
+
+function processTap(x, y) {
+  let selX = Math.floor((x - transE.x) / 32),
+      selY = Math.floor((y - transE.y) / 32)
+    
+  selectionType = 0
+  if(selX === 128 && selY === 128) {
+    selectionType = 1
+  } else {
+    for(let ant of ants) {
+      if(selX === Math.round(ant.x) && selY === Math.round(ant.y)) {
+        selectionType = 2
+        selectionObj = ant
+      }
+    }
+  }
+  entity_buf.ant_paint()
+  map.ant_paint()
 }
 
 if(urlParams.get("initGame")) {
