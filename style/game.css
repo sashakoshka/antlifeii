@@ -24,7 +24,7 @@ body{
 
 #panel>div{
   display:grid;height:40px;
-  grid-template-columns:48px auto;grid-template-rows:20px 20px;
+  grid-template-columns:96px auto;grid-template-rows:20px 20px;
   padding:0 6px 0 16px}
 #panel>div>span{
   display:flex;align-items:center;

@@ -38,6 +38,7 @@ class Ant {
     ants = ants.filter((ant) => {
       return ant.id !== this.id
     })
+    updateBars()
   }
   
   get tileOn() {

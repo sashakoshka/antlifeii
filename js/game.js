@@ -17,6 +17,7 @@ let panel,               // bottom panel
     buttonPause,         // pause button
     terrain,             // holds all tiles in the terrain
     ants,                // holds all ants
+    antsMax,
     food,
     foodMax,
     
@@ -103,6 +104,7 @@ async function initGame(slot) { // 0 will be multiplayer
   transE.x = trans.x
   transE.y = trans.y
   animFrame = 0
+  antsMax = 512
   food = 16
   foodMax = 128
   
@@ -146,26 +148,18 @@ async function initGame(slot) { // 0 will be multiplayer
     // right of the minimap, has bars and info
     let panelControlDiv = document.createElement("div"); {
       // shows amount of food
-      foodSpan = document.createElement("span"); {
-        foodSpan.innerText = "Food"
-        panelControlDiv.appendChild(foodSpan)
-      }
-      foodBar = document.createElement("progress"); {
-        foodBar.setAttribute("max", foodMax)
-        foodBar.setAttribute("value", food)
-        panelControlDiv.appendChild(foodBar)
-      }
+      foodSpan = document.createElement("span")
+      panelControlDiv.appendChild(foodSpan)
+      foodBar = document.createElement("progress")
+      panelControlDiv.appendChild(foodBar)
       
       // shows amount of ants
-      antSpan = document.createElement("span"); {
-        antSpan.innerText = "Ants"
-        panelControlDiv.appendChild(antSpan)
-      }
-      antBar = document.createElement("progress"); {
-        antBar.setAttribute("max", 512)
-        antBar.setAttribute("value", 256)
-        panelControlDiv.appendChild(antBar)
-      }
+      antSpan = document.createElement("span")
+      panelControlDiv.appendChild(antSpan)
+      antBar = document.createElement("progress")
+      panelControlDiv.appendChild(antBar)
+      
+      updateBars()
       panel.appendChild(panelControlDiv)
     }
     document.body.appendChild(panel)
@@ -406,6 +400,15 @@ function tick() {
     entity_buf.ant_paint()
     map.ant_paint()
   }
+}
+
+function updateBars() {
+  foodSpan.innerText = "Food (" + food + "/" + foodMax + ")"
+  foodBar.setAttribute("max", foodMax)
+  foodBar.setAttribute("value", food)
+  antSpan.innerText = "Ants (" + ants.length + "/" + antsMax + ")"
+  antBar.setAttribute("max", antsMax)
+  antBar.setAttribute("value", ants.length)
 }
 
 if(urlParams.get("initGame")) {
