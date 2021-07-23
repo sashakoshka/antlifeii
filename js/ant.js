@@ -32,13 +32,13 @@ class Ant {
   }
   
   face(dir) {
-    dir = Math.round(dir)
+    dir = Math.floor(dir)
     this.dir = dir
   }
   
   tick() {
     this.step(0.125)
-    if(Math.random() < 0.1) this.face(Math.random() * 3)
+    if(Math.random() < 0.1) this.face(Math.random() * 4)
     if(this.y > terrain.length - 1) {
       this.dir = 0
       this.step(0.125)

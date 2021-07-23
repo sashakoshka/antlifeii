@@ -121,16 +121,16 @@ async function initGame(slot) { // 0 will be multiplayer
   minimap = document.createElement("canvas"); {
     minimapctx = minimap.getContext("2d")
     minimap.ant_paint = minimap_paint
-    minimap.setAttribute("width",  96)
-    minimap.setAttribute("height", 96)
+    minimap.setAttribute("width",  128)
+    minimap.setAttribute("height", 128)
     minimap.setAttribute("id", "minimap")
     
     // click on the minimap to move
     minimap.addEventListener("mousedown", (e) => {
       let rect = e.target.getBoundingClientRect()
       
-      trans.x -= (e.clientX - rect.left - 48.5) * 32
-      trans.y -= (e.clientY - rect.top  - 48) * 32
+      trans.x -= (e.clientX - rect.left - 64.5) * 32
+      trans.y -= (e.clientY - rect.top  - 64) * 32
     })
     
     minimap_paint()
@@ -174,6 +174,14 @@ async function initGame(slot) { // 0 will be multiplayer
     map.addEventListener("mousemove", (e) => {
       e.preventDefault()
       if(dragging) {
+        trans.x = e.clientX - touchStart.x + transStart.x
+        trans.y = e.clientY - touchStart.y + transStart.y
+      }
+    })
+    // should not stop when moving over panel
+    panel.addEventListener("mousemove", (e) => {
+      if(dragging) {
+        e.preventDefault()
         trans.x = e.clientX - touchStart.x + transStart.x
         trans.y = e.clientY - touchStart.y + transStart.y
       }
@@ -249,13 +257,13 @@ function minimap_paint() {
   let viewW = Math.round(view.clientWidth  / 32),
       viewH = Math.round(view.clientHeight / 32)
   
-  let colC = Math.round(transE.x / -32 - (96 - viewW) / 2)
-  let row  = Math.round(transE.y / -32 - (96 - viewH) / 2)
+  let colC = Math.round(transE.x / -32 - (128 - viewW) / 2)
+  let row  = Math.round(transE.y / -32 - (128 - viewH) / 2)
   let col
   
-  for(let y = 0; y < 96; y++) {
+  for(let y = 0; y < 128; y++) {
     col = colC
-    for(let x = 0; x < 96; x++) {
+    for(let x = 0; x < 128; x++) {
       if(
         row < 0 || row >= terrain.length ||
         col < 0 || col >= terrain[0].length
@@ -272,7 +280,7 @@ function minimap_paint() {
   minimapctx.strokeStyle = "white"
   
   minimapctx.strokeRect(
-    Math.round((96 - viewW) / 2) + 0.5, Math.round((96 - viewH) / 2) + 0.5,
+    Math.round((128 - viewW) / 2) + 0.5, Math.round((128 - viewH) / 2) + 0.5,
     viewW, viewH
   )
 }

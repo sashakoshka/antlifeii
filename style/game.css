@@ -7,14 +7,14 @@ body{
 
 #view{
   position:fixed;top:0;left:0;
-  width:100%;height:calc(100% - 128px)}
+  width:100%;height:calc(100% - 160px)}
 
 #view canvas{
   width:100%;height:100%}
 
 #panel{
   position:fixed;left:0;bottom:0;
-  width:calc(100% - 32px);height:96px;
+  width:calc(100% - 32px);height:128px;
   padding:16px;
   border-image:var(--tex-border) 8 / 8px / 0 repeat;
   background-image:var(--tex-wood0);
