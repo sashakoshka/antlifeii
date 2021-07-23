@@ -1,26 +1,42 @@
+let antsCount = 0
+
 class Ant {
   constructor(x, y, type) {
     this.x = x
     this.y = y
     this.lastLand = {x: 0, y: 0}
-    this.type = type
+    this.type = type ?? 0
+    
+    // have a unique ant id
+    this.id = antsCount ++
     
     switch(type) {
       case 0:
-        maxHealth: 4
+        this.maxHealth = 4
         break
       case 1:
-        maxHealth: 8
+        this.maxHealth = 8
         break
       case 2:
-        maxHealth: 6
+        this.maxHealth = 6
         break
     }
     
-    this.heath = this.maxHealth
+    this.health = this.maxHealth
     this.cargo = null
     this.cargoCount = 0
     this.dir = 2
+  }
+  
+  hurt(damage) {
+    this.health -= damage
+    if(this.health <= 0) this.die()
+  }
+  
+  die() {
+    ants = ants.filter((ant) => {
+      return ant.id !== this.id
+    })
   }
   
   get tileOn() {
@@ -58,6 +74,8 @@ class Ant {
       } else {
         this.face(2)
       }
+      
+      if(Math.random() < 0.1) this.hurt(1)
     } else {
       this.lastLand.x = this.x
       this.lastLand.y = this.y
