@@ -9,11 +9,9 @@ body{
   -webkit-touch-callout:none !important;-webkit-user-select:none !important}
 
 .title{
-  font-size:48px;font-family:spec-b;
-  background: linear-gradient(#f3e2c7 0%,#c19e67 50%,#b68d4c 51%, #e9d4b3 100%);
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter:drop-shadow(0 2px 4px black)}
+  width:256px;height:64px;
+  color:transparent;background-image:var(--tex-title);
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5))}
 
 .menu>a{color:#d8d0b0;text-shadow:0 2px 4px black;text-decoration:none;cursor:pointer}
 .menu>a:hover{text-decoration:underline}

@@ -56,6 +56,7 @@ css: clean-css
 	./base64.sh tex/paper0.png       css        >> build/style.css
 	./base64.sh tex/sky0.png         css        >> build/style.css
 	./base64.sh tex/loading.gif      css        >> build/style.css
+	./base64.sh tex/title.png        css        >> build/style.css
 	echo "}"                                    >> build/style.css
 	cat style/inline.css style/widget.css       >> build/style.css
 	
