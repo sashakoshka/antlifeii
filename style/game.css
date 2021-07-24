@@ -31,10 +31,15 @@ body{
 #barcontainer>span{display:flex;align-items:center}
 #barcontainer>progress{display:flex;align-items:center;margin:6px 0}
 
+#minimap{box-shadow:0 2px 4px rgba(0,0,0,0.7)}
+
 #controlpanel{white-space:pre-wrap}
 #controlpanel button{padding:0;border-width:4px}
 
-#minimap{box-shadow:0 2px 4px rgba(0,0,0,0.7)}
+button.makeantbutton  {width:64px;height:64px;margin:8px 16px 0 0}
+#makeworkerantbutton  {background-image:var(--tex-workerbutton)}
+#makesoldierantbutton {background-image:var(--tex-soldierbutton)}
+#makebuilderantbutton {background-image:var(--tex-builderbutton)}
 
 @media(min-width:544px){
   body{display:block}

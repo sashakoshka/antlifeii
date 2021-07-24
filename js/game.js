@@ -467,6 +467,10 @@ function updateBars() {
   antBar.setAttribute("value", ants.length)
 }
 
+function makeAnt(type) {
+  ants.push(new Ant(128, 128, type))
+}
+
 function processTap(x, y) {
   let selX = Math.floor((x - transE.x) / 32),
       selY = Math.floor((y - transE.y) / 32)
@@ -489,34 +493,37 @@ function processTap(x, y) {
       let makeAntButton = document.createElement("button"); {
         makeAntButton.innerText = "Make Ants"
         makeAntButton.addEventListener("click", (e) => {
-          ants.push(new Ant(128, 128, 0))
+          controlPanel.textContent = ""
+          let makeWorkerAntButton = document.createElement("button"); {
+            makeWorkerAntButton.setAttribute("id", "makeworkerantbutton")
+            makeWorkerAntButton.setAttribute("class", "makeantbutton")
+            makeWorkerAntButton.addEventListener("click", (e) => {
+              makeAnt(0)
+            })
+            controlPanel.appendChild(makeWorkerAntButton)
+          }
+          let makeSoldierAntButton = document.createElement("button"); {
+            makeSoldierAntButton.setAttribute("id", "makesoldierantbutton")
+            makeSoldierAntButton.setAttribute("class", "makeantbutton")
+            makeSoldierAntButton.addEventListener("click", (e) => {
+              makeAnt(1)
+            })
+            controlPanel.appendChild(makeSoldierAntButton)
+          }
+          let makeBuilderAntButton = document.createElement("button"); {
+            makeBuilderAntButton.setAttribute("id", "makebuilderantbutton")
+            makeBuilderAntButton.setAttribute("class", "makeantbutton")
+            makeBuilderAntButton.addEventListener("click", (e) => {
+              makeAnt(2)
+            })
+            controlPanel.appendChild(makeBuilderAntButton)
+          }
         })
         controlPanel.appendChild(makeAntButton)
       }
       break
     case 2:
-      let stats = "[Health: " + selectionObj.health +
-                  "/" + selectionObj.maxHealth +
-                  "] [Breath: " + selectionObj.breath +
-                  "/" + 7 + "]\n"
-      switch(selectionObj.type) {
-        case 0:
-          stats = "Worker Ant " + stats +
-                  "Worker ants can collect food for the colony, but they " +
-                  "cannot fight against hostile creatures."
-          break
-        case 1:
-          stats = "Soldier Ant " + stats +
-                  "Soldier Ants serve to protect the colony from hostile " +
-                  "entities."
-          break
-        case 2:
-          stats = "Builder Ant " + stats +
-                  "Builder ants cannot collect food or fight, but can " +
-                  "be used to upgrade the colony and terraform."
-          break
-      }
-      controlPanel.innerText = stats
+      selectionObj.reportInfo()
   }
   
   entity_buf.ant_paint()

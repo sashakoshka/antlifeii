@@ -47,16 +47,19 @@ js: clean-js
 
 css: clean-css
 	echo ":root{"                               >  build/style.css
-	./base64.sh tex/grass-scroll.gif css        >> build/style.css
-	./base64.sh tex/border.png       css        >> build/style.css
-	./base64.sh tex/wood0.png        css        >> build/style.css
-	./base64.sh tex/wood1.png        css        >> build/style.css
-	./base64.sh tex/wood1-border.png css        >> build/style.css
-	./base64.sh tex/pause.png        css        >> build/style.css
-	./base64.sh tex/paper0.png       css        >> build/style.css
-	./base64.sh tex/sky0.png         css        >> build/style.css
-	./base64.sh tex/loading.gif      css        >> build/style.css
-	./base64.sh tex/title.png        css        >> build/style.css
+	./base64.sh tex/grass-scroll.gif  css       >> build/style.css
+	./base64.sh tex/border.png        css       >> build/style.css
+	./base64.sh tex/wood0.png         css       >> build/style.css
+	./base64.sh tex/wood1.png         css       >> build/style.css
+	./base64.sh tex/wood1-border.png  css       >> build/style.css
+	./base64.sh tex/pause.png         css       >> build/style.css
+	./base64.sh tex/paper0.png        css       >> build/style.css
+	./base64.sh tex/sky0.png          css       >> build/style.css
+	./base64.sh tex/loading.gif       css       >> build/style.css
+	./base64.sh tex/title.png         css       >> build/style.css
+	./base64.sh tex/workerbutton.png  css       >> build/style.css
+	./base64.sh tex/soldierbutton.png css       >> build/style.css
+	./base64.sh tex/builderbutton.png css       >> build/style.css
 	echo "}"                                    >> build/style.css
 	cat style/inline.css style/widget.css       >> build/style.css
 	

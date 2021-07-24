@@ -53,9 +53,9 @@ input[type="submit"]:active,button:active{
 input[type="submit"]:focus,button:focus{outline:none}
 
 input[type="submit"]:focus::before,
-button:not(.pause):focus::before {content:"[ "}
+button:not(.pause):not(.makeantbutton):focus::before {content:"[ "}
 input[type="submit"]:focus::after,
-button:not(.pause):focus::after  {content:" ]"}
+button:not(.pause):not(.makeantbutton):focus::after  {content:" ]"}
 
 button.pause{
   position:fixed;top:8px;left:calc(50% - 24px);

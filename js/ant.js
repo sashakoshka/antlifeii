@@ -39,11 +39,41 @@ class Ant {
     this.cargo = null
     this.cargoCount = 0
     this.dir = 2
+    
+    updateBars() // because we probably just increased our ant count
+  }
+  
+  reportInfo() {
+    if(selectionType === 2 && selectionObj.id === this.id) {
+      let stats = "[Health: " + this.health +
+                  "/" + this.maxHealth +
+                  "] [Breath: " + this.breath +
+                  "/" + 7 + "]\n"
+      switch(this.type) {
+        case 0:
+          stats = "Worker Ant " + stats +
+                  "Worker ants can collect food for the colony, but they " +
+                  "cannot fight against hostile creatures."
+          break
+        case 1:
+          stats = "Soldier Ant " + stats +
+                  "Soldier Ants serve to protect the colony from hostile " +
+                  "entities."
+          break
+        case 2:
+          stats = "Builder Ant " + stats +
+                  "Builder ants cannot collect food or fight, but can " +
+                  "be used to upgrade the colony and terraform."
+          break
+      }
+      controlPanel.innerText = stats
+    }
   }
   
   hurt(damage) {
     this.health -= damage
     if(this.health <= 0) this.die()
+    this.reportInfo()
   }
   
   die() {
@@ -52,6 +82,7 @@ class Ant {
     })
     if(selectionType === 2 && selectionObj.id === this.id) selectionType = 0
     updateBars()
+    this.reportInfo()
   }
   
   get tileOn() {
@@ -91,7 +122,7 @@ class Ant {
       }
       
       if(Math.random() < 0.1)
-        if(this.breath > 0) this.breath --
+        if(this.breath > 0) {this.breath -- ; this.reportInfo()}
         else this.hurt(1)
     } else {
       this.lastLand.x = this.x
@@ -112,7 +143,7 @@ class Ant {
         this.step(0.125)
       }
       
-      if(this.breath < 7) this.breath ++
+      if(this.breath < 7) {this.breath ++ ; this.reportInfo()}
     }
     if(Math.random() < 0.0001) {
       if(food > 0) {
