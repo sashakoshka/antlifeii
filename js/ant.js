@@ -12,6 +12,7 @@ class Ant {
       2: builder
     */
     this.type = type ?? 0
+    if(this.type > 2 || this.type < 0) this.type = 0
     
     /*
       0: wander
@@ -21,7 +22,7 @@ class Ant {
     // have a unique ant id
     this.id = antsCount ++
     
-    switch(type) {
+    switch(this.type) {
       case 0:
         this.maxHealth = 4
         break

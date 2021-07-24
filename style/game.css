@@ -19,19 +19,20 @@ body{
   padding:16px;
   border-image:var(--tex-border) 8 / 8px / 0 repeat;
   background-image:var(--tex-wood0);
+  color:white;text-shadow:0 2px 4px black;
   box-shadow:0 2px 4px rgba(0,0,0,0.7);
   transition:bottom 0.2s}
 
-#panel>div{
-  display:grid;height:40px;
-  grid-template-columns:96px auto;grid-template-rows:20px 20px;
-  padding:0 6px 0 16px}
-#panel>div>span{
-  display:flex;align-items:center;
-  color:white;text-shadow:0 2px 4px black}
-#panel>div>progress{
-  display:flex;align-items:center;margin:6px 0
-}
+#panel>div{padding:0 6px 0 16px}
+
+#barcontainer{
+  display:grid;height:40px;margin-bottom:8px;
+  grid-template-columns:96px auto;grid-template-rows:20px 20px}
+#barcontainer>span{display:flex;align-items:center}
+#barcontainer>progress{display:flex;align-items:center;margin:6px 0}
+
+#controlpanel{white-space:pre-wrap}
+#controlpanel button{padding:0;border-width:4px}
 
 #minimap{box-shadow:0 2px 4px rgba(0,0,0,0.7)}
 

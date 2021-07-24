@@ -5,6 +5,7 @@ let panel,               // bottom panel
       foodBar,
       antSpan,
       antBar,
+      controlPanel,      // shows info, controls about current selection
     view,                // either contains map or hill
     map,                 // main gameplay canvas
       mapctx,
@@ -26,7 +27,7 @@ let panel,               // bottom panel
     touchOff   = {},     // holds the current touch coordinates
     trans  = {x:0, y:0}, // holds the current canvas contents position
     transE = {x:0, y:0}, // holds canvas position after easing function
-    dragging = false,    // if mouse is dragging
+    dragging   = false,  // if mouse is dragging
     viewMoving = false,  // if view is moving
     touchMoved,          // if the touch moved
     
@@ -57,7 +58,7 @@ const resizeObserver = new ResizeObserver((entries) => {
 })
 
 async function initGame(slot) { // 0 will be multiplayer
-  if(!urlParams.get("initGame")) await fadeOut()
+  await fadeOut()
   setStyle(gamecss)
   scrub(document.body)
   
@@ -97,10 +98,6 @@ async function initGame(slot) { // 0 will be multiplayer
   
   // wipe entities
   ants = []
-  for(let i = 0; i < 512; i++)
-    ants.push(new Ant(
-      Math.round(Math.random() * 256), Math.round(Math.random() * 256), 0
-    ))
   
   // reset variables
   trans.x = Math.round((terrain   .length * -32 + window.innerWidth ) / 2)
@@ -113,7 +110,7 @@ async function initGame(slot) { // 0 will be multiplayer
   
   animFrame = 0
   
-  antsMax = 512
+  antsMax = 8192
   food = 16
   foodMax = 128
   
@@ -155,22 +152,34 @@ async function initGame(slot) { // 0 will be multiplayer
     }
     
     // right of the minimap, has bars and info
-    let panelControlDiv = document.createElement("div"); {
-      // shows amount of food
-      foodSpan = document.createElement("span")
-      panelControlDiv.appendChild(foodSpan)
-      foodBar = document.createElement("progress")
-      panelControlDiv.appendChild(foodBar)
+    let panelRightCol = document.createElement("div"); {
+      let barContainer = document.createElement("div"); {
+        barContainer.setAttribute("id", "barcontainer")
       
-      // shows amount of ants
-      antSpan = document.createElement("span")
-      panelControlDiv.appendChild(antSpan)
-      antBar = document.createElement("progress")
-      panelControlDiv.appendChild(antBar)
+        // shows amount of food
+        foodSpan = document.createElement("span")
+        barContainer.appendChild(foodSpan)
+        foodBar = document.createElement("progress")
+        barContainer.appendChild(foodBar)
+        
+        // shows amount of ants
+        antSpan = document.createElement("span")
+        barContainer.appendChild(antSpan)
+        antBar = document.createElement("progress")
+        barContainer.appendChild(antBar)
+        
+        updateBars()
+        panelRightCol.appendChild(barContainer)
+      }
       
-      updateBars()
-      panel.appendChild(panelControlDiv)
+      // shows info, controls about currently selected whatever
+      controlPanel = document.createElement("div")
+      controlPanel.setAttribute("id", "controlpanel")
+      panelRightCol.appendChild(controlPanel)
+      
+      panel.appendChild(panelRightCol)
     }
+    
     document.body.appendChild(panel)
   }
     
@@ -423,7 +432,7 @@ function entity_buf_paint() {
     entity_bufctx.drawImage(
       texUI[0],
       (animFrame < 8) * 48, 0, 48, 48,
-      selX * 32 - 24, selY * 32 - 24, 48, 48
+      selX * 32 - 24, selY * 32 - 32, 48, 48
     )
   }
   
@@ -461,8 +470,9 @@ function updateBars() {
 function processTap(x, y) {
   let selX = Math.floor((x - transE.x) / 32),
       selY = Math.floor((y - transE.y) / 32)
-    
+  
   selectionType = 0
+  controlPanel.textContent = ""
   if(selX === 128 && selY === 128) {
     selectionType = 1
   } else {
@@ -473,6 +483,42 @@ function processTap(x, y) {
       }
     }
   }
+  
+  switch (selectionType) {
+    case 1:
+      let makeAntButton = document.createElement("button"); {
+        makeAntButton.innerText = "Make Ants"
+        makeAntButton.addEventListener("click", (e) => {
+          ants.push(new Ant(128, 128, 0))
+        })
+        controlPanel.appendChild(makeAntButton)
+      }
+      break
+    case 2:
+      let stats = "[Health: " + selectionObj.health +
+                  "/" + selectionObj.maxHealth +
+                  "] [Breath: " + selectionObj.breath +
+                  "/" + 7 + "]\n"
+      switch(selectionObj.type) {
+        case 0:
+          stats = "Worker Ant " + stats +
+                  "Worker ants can collect food for the colony, but they " +
+                  "cannot fight against hostile creatures."
+          break
+        case 1:
+          stats = "Soldier Ant " + stats +
+                  "Soldier Ants serve to protect the colony from hostile " +
+                  "entities."
+          break
+        case 2:
+          stats = "Builder Ant " + stats +
+                  "Builder ants cannot collect food or fight, but can " +
+                  "be used to upgrade the colony and terraform."
+          break
+      }
+      controlPanel.innerText = stats
+  }
+  
   entity_buf.ant_paint()
   map.ant_paint()
 }
